@@ -44,7 +44,7 @@ public class Robot {
         CommandScheduler.getInstance().reset();
         CommandScheduler.getInstance().cancelAll();
 
-        RunCommand defaultDriveCommand = new RunCommand(() -> driveSubsystem.drive(driverGamepad.getLeftY(), driverGamepad.getLeftX(), driverGamepad.getRightX()));
+        RunCommand defaultDriveCommand = new RunCommand(() -> driveSubsystem.drive(driverGamepad.getLeftY(), driverGamepad.getRightX()));
         defaultDriveCommand.addRequirements(driveSubsystem);
 
         driveSubsystem.setDefaultCommand(defaultDriveCommand);

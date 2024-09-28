@@ -50,11 +50,11 @@ public class DriveSubsystem extends SubsystemBase {
         backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         //resetGyro();
-        //resetEncoders();
+        resetEncoders();
     }
     
-    public void drive(double forward, double strafe, double turn) {
-        driveRobotCentric(forward, strafe, turn);
+    public void drive(double forward, double turn) {
+        driveRobotCentric(forward, turn);
         //if(fieldCentric) driveFieldCentric(forward, strafe, turn); else driveRobotCentric(forward, strafe, turn);
     }
 /*
@@ -71,11 +71,10 @@ public class DriveSubsystem extends SubsystemBase {
         backRightMotor.setPower(Range.clip((fieldCentricDrive + fieldCentricStrafe - turn), -1, 1) * speedMultiplier);
     }
 */
-    private void driveRobotCentric(double forward, double strafe, double turn) {
+    private void driveRobotCentric(double forward, double turn) {
         turn = -turn;
         //edited to act like a tank
         forward = Math.abs(forward) >= Constants.DriveConstants.DEADZONE ? forward : 0;
-        strafe = Math.abs(strafe) >= Constants.DriveConstants.DEADZONE ? strafe : 0;
         turn = Math.abs(turn) >= Constants.DriveConstants.DEADZONE ? turn : 0;
 
         frontLeftMotor.setPower(Range.clip((forward  + turn), -1, 1) * speedMultiplier);    //useful for tank drive robot
