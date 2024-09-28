@@ -30,10 +30,10 @@ public class DriveSubsystem extends SubsystemBase {
 
     public DriveSubsystem(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
-        
+        /*
         imu = hardwareMap.get(BHI260IMU.class, Constants.DriveConstants.IMU_NAME);
         imu.initialize(Constants.DriveConstants.IMU_PARAMETERS);
-
+    */
         frontLeftMotor = hardwareMap.get(DcMotorEx.class, Constants.DriveConstants.FRONT_LEFT_MOTOR_NAME);
         frontRightMotor = hardwareMap.get(DcMotorEx.class, Constants.DriveConstants.FRONT_RIGHT_MOTOR_NAME);
         backLeftMotor = hardwareMap.get(DcMotorEx.class, Constants.DriveConstants.BACK_LEFT_MOTOR_NAME);
@@ -49,14 +49,15 @@ public class DriveSubsystem extends SubsystemBase {
         backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        resetGyro();
-        resetEncoders();
+        //resetGyro();
+        //resetEncoders();
     }
     
     public void drive(double forward, double strafe, double turn) {
-        if(fieldCentric) driveFieldCentric(forward, strafe, turn); else driveRobotCentric(forward, strafe, turn);
+        driveRobotCentric(forward, strafe, turn);
+        //if(fieldCentric) driveFieldCentric(forward, strafe, turn); else driveRobotCentric(forward, strafe, turn);
     }
-
+/*
     private void driveFieldCentric(double forward, double strafe, double turn) {
         turn = -turn;
     //useless for this bot
@@ -69,7 +70,7 @@ public class DriveSubsystem extends SubsystemBase {
         backLeftMotor.setPower(Range.clip((fieldCentricDrive - fieldCentricStrafe + turn), -1, 1) * speedMultiplier);
         backRightMotor.setPower(Range.clip((fieldCentricDrive + fieldCentricStrafe - turn), -1, 1) * speedMultiplier);
     }
-
+*/
     private void driveRobotCentric(double forward, double strafe, double turn) {
         turn = -turn;
         //edited to act like a tank
@@ -77,7 +78,7 @@ public class DriveSubsystem extends SubsystemBase {
         strafe = Math.abs(strafe) >= Constants.DriveConstants.DEADZONE ? strafe : 0;
         turn = Math.abs(turn) >= Constants.DriveConstants.DEADZONE ? turn : 0;
 
-        frontLeftMotor.setPower(Range.clip((forward  + turn), -1, 1) * speedMultiplier);
+        frontLeftMotor.setPower(Range.clip((forward  + turn), -1, 1) * speedMultiplier);    //useful for tank drive robot
         frontRightMotor.setPower(Range.clip((forward  - turn), -1, 1) * speedMultiplier);
         backLeftMotor.setPower(Range.clip((forward  + turn), -1, 1) * speedMultiplier);
         backRightMotor.setPower(Range.clip((forward - turn), -1, 1) * speedMultiplier);
@@ -86,7 +87,7 @@ public class DriveSubsystem extends SubsystemBase {
     public void setSpeedMultiplier(double multiplier) {
         speedMultiplier = Range.clip(multiplier, 0, 1);
     }
-
+    /*
     public void resetGyro() {
         imu.resetYaw();
     }
@@ -94,7 +95,7 @@ public class DriveSubsystem extends SubsystemBase {
     public void setFieldCentricOnOff(){
         //fieldCentric = !fieldCentric; 
     }
-
+    */
     public void resetEncoders() {
         frontLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -106,8 +107,10 @@ public class DriveSubsystem extends SubsystemBase {
         backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
-
+/*
     private double getHeading() {
         return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
+
+*/
 }
