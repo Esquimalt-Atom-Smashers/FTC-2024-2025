@@ -43,4 +43,27 @@ public abstract class Constants {
 
     public static final int INCH_TO_TILE = 24;
 
+    public static abstract class IntakeConstants{
+        public static final String HORIZONTAL_SLIDE_LEFT_MOTOR_NAME = "horizontalSlideLeftMotor";
+        public static final String HORIZONTAL_SLIDE_RIGHT_MOTOR_NAME = "horizontalSlideRightMotor";
+
+        public static final String ACTIVE_INTAKE_SERVO_NAME = "activeIntakeServo";
+        public static final String INTAKE_WRIST_SERVO_NAME = "intakeWristServo";
+
+        public static final double INTAKE_WRIST_SERVO_MIN_ANGLE = 0;
+        public static final double INTAKE_WRIST_SERVO_MAX_ANGLE = 270;
+
+
+    }
+
+    public static abstract class OuttakeConstants{
+        public static final String VERTICAL_SLIDE_LEFT_MOTOR_NAME = "verticalSlideLeftMotor";
+        public static final String VERTICAL_SLIDE_RIGHT_MOTOR_NAME = "verticalSlideRightMotor";
+
+        public static final String PINCH_SERVO_NAME = "pinchServo";
+        public static final String OUTTAKE_WRIST_SERVO_NAME = "outtakeWristServo";
+    }
+
+
+
 }
