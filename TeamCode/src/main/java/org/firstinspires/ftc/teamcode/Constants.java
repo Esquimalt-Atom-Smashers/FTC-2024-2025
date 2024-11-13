@@ -52,6 +52,11 @@ public abstract class Constants {
 
         public static final double INTAKE_WRIST_SERVO_MIN_ANGLE = 0;
         public static final double INTAKE_WRIST_SERVO_MAX_ANGLE = 270;
+        public static final double INTAKE_WRIST_SERVO_UP_POSITION = -1;
+        public static final double INTAKE_WRIST_SERVO_DOWN_POSITION = -1;
+
+        public static final DcMotorSimple.Direction HORIZONTAL_SLIDE_LEFT_MOTOR_DIRECTION = DcMotorSimple.Direction.REVERSE;
+        public static final DcMotorSimple.Direction HORIZONTAL_SLIDE_RIGHT_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
 
 
     }

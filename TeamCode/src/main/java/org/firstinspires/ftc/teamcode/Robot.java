@@ -23,15 +23,21 @@ public class Robot {
     private final OpMode opMode;
 
     private final GamepadEx driverGamepad;
+    private final GamepadEx operatorGamepad;
 
     private final DriveSubsystem driveSubsystem;
+
+    private final IntakeSubsystem intakeSubsystem;
 
     public Robot(OpMode opMode) {
         this.opMode = opMode;
 
         driverGamepad = new GamepadEx(opMode.gamepad1);
+        operatorGamepad = new GamepadEx(opMode.gamepad2);
     
         driveSubsystem = new DriveSubsystem(opMode.hardwareMap);
+
+        intakeSubsystem = new IntakeSubsystem(opMode.hardwareMap);
     }
 
     public void configureTeleOpBindings() {
@@ -64,6 +70,26 @@ public class Robot {
 
         Trigger setFieldCentric = new Trigger(() -> driverGamepad.getButton(GamepadKeys.Button.START));
         setFieldCentric.whenActive(() -> driveSubsystem.setFieldCentricOnOff());
+
+        //temporary setting just for testing purpose
+        Trigger horizontalSlideSpeedVariationTrigger = new Trigger(() -> isPressed(operatorGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)));
+        horizontalSlideSpeedVariationTrigger.whenActive(() -> intakeSubsystem.changeHorizontalSlideSpeedMultiplier());
+
+        Trigger runActiveIntake = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.BACK));
+        runActiveIntake.whenActive(()-> intakeSubsystem.runActiveIntakeServo());
+        runActiveIntake.whenInactive(()-> intakeSubsystem.stopActiveIntakeServo());
+
+        Trigger turnIntakeWrist = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.START));
+        turnIntakeWrist.whenActive(()-> intakeSubsystem.downPosition());
+        turnIntakeWrist.whenInactive(()-> intakeSubsystem.upPosition());
+
+        RunCommand defaultHorizontalSlideCommand = new RunCommand(() -> intakeSubsystem.runHorizontalSlides(operatorGamepad.getLeftY()));
+        defaultHorizontalSlideCommand.addRequirements(intakeSubsystem);
+
+        intakeSubsystem.setDefaultCommand(defaultHorizontalSlideCommand);
+
+
+
     }
 
     public void configureAutoSetting(){
