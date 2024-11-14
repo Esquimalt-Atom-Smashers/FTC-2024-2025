@@ -7,15 +7,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.arcrobotics.ftclib.command.RunCommand;
 // RR-specific imports
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
 
-import org.firstinspires.ftc.teamcode.opmodes.*;
 import org.firstinspires.ftc.teamcode.subsystems.*;
 
 public class Robot {
@@ -71,7 +63,8 @@ public class Robot {
         Trigger setFieldCentric = new Trigger(() -> driverGamepad.getButton(GamepadKeys.Button.START));
         setFieldCentric.whenActive(() -> driveSubsystem.setFieldCentricOnOff());
 
-        //temporary setting just for testing purpose
+        // temporary setting just for testing purpose
+        // Intake bindings
         Trigger horizontalSlideSpeedVariationTrigger = new Trigger(() -> isPressed(operatorGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)));
         horizontalSlideSpeedVariationTrigger.whenActive(() -> intakeSubsystem.changeHorizontalSlideSpeedMultiplier());
 
@@ -80,8 +73,8 @@ public class Robot {
         runActiveIntake.whenInactive(()-> intakeSubsystem.stopActiveIntakeServo());
 
         Trigger turnIntakeWrist = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.START));
-        turnIntakeWrist.whenActive(()-> intakeSubsystem.downPosition());
-        turnIntakeWrist.whenInactive(()-> intakeSubsystem.upPosition());
+        turnIntakeWrist.whenActive(()-> intakeSubsystem.servoDownPosition());
+        turnIntakeWrist.whenInactive(()-> intakeSubsystem.servoUpPosition());
 
         RunCommand defaultHorizontalSlideCommand = new RunCommand(() -> intakeSubsystem.runHorizontalSlides(operatorGamepad.getLeftY()));
         defaultHorizontalSlideCommand.addRequirements(intakeSubsystem);
@@ -101,9 +94,12 @@ public class Robot {
 
     public void run() {
         CommandScheduler.getInstance().run();
+        
+
         opMode.telemetry.addData("Speed Multiplier",driveSubsystem.speedMultiplier);
-        opMode.telemetry.addData("Y axis:", driverGamepad.getLeftY());
+        opMode.telemetry.addData("Y axis:", operatorGamepad.getLeftY());
         opMode.telemetry.addData("Is fieldcentric?",driveSubsystem.fieldCentric);
+        opMode.telemetry.addData("operator, arm thing: ",driveSubsystem.fieldCentric);
         opMode.telemetry.update();
     }
 
