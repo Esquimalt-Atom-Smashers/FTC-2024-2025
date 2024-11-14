@@ -68,11 +68,11 @@ public class Robot {
         Trigger horizontalSlideSpeedVariationTrigger = new Trigger(() -> isPressed(operatorGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)));
         horizontalSlideSpeedVariationTrigger.whenActive(() -> intakeSubsystem.changeHorizontalSlideSpeedMultiplier());
 
-        Trigger runActiveIntake = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.BACK));
+        Trigger runActiveIntake = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.A));
         runActiveIntake.whenActive(()-> intakeSubsystem.runActiveIntakeServo());
         runActiveIntake.whenInactive(()-> intakeSubsystem.stopActiveIntakeServo());
 
-        Trigger turnIntakeWrist = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.START));
+        Trigger turnIntakeWrist = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.B));
         turnIntakeWrist.whenActive(()-> intakeSubsystem.servoDownPosition());
         turnIntakeWrist.whenInactive(()-> intakeSubsystem.servoUpPosition());
 
