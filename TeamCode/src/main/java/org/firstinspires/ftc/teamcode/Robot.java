@@ -29,7 +29,7 @@ public class Robot {
     
         driveSubsystem = new DriveSubsystem(opMode.hardwareMap);
 
-        intakeSubsystem = new IntakeSubsystem(opMode.hardwareMap);
+        intakeSubsystem = new IntakeSubsystem(opMode.hardwareMap,opMode);
     }
 
     public void configureTeleOpBindings() {
@@ -60,7 +60,7 @@ public class Robot {
         Trigger resetGyro = new Trigger(() -> driverGamepad.getButton(GamepadKeys.Button.BACK));
         resetGyro.whenActive(() -> driveSubsystem.resetGyro());
 
-        Trigger setFieldCentric = new Trigger(() -> driverGamepad.getButton(GamepadKeys.Button.START));
+        Trigger setFieldCentric = new Trigger(() -> driverGamepad.getButton(GamepadKeys.Button.B));
         setFieldCentric.whenActive(() -> driveSubsystem.setFieldCentricOnOff());
 
         // temporary setting just for testing purpose
@@ -69,11 +69,11 @@ public class Robot {
         horizontalSlideSpeedVariationTrigger.whenActive(() -> intakeSubsystem.changeHorizontalSlideSpeedMultiplier());
 
         Trigger runActiveIntake = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.A));
-        runActiveIntake.whenActive(()-> intakeSubsystem.runActiveIntakeServo());
+        runActiveIntake.whileActiveContinuous(()-> intakeSubsystem.runActiveIntakeServo());
         runActiveIntake.whenInactive(()-> intakeSubsystem.stopActiveIntakeServo());
 
         Trigger turnIntakeWrist = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.B));
-        turnIntakeWrist.whenActive(()-> intakeSubsystem.servoDownPosition());
+        turnIntakeWrist.whileActiveContinuous(()-> intakeSubsystem.servoDownPosition());
         turnIntakeWrist.whenInactive(()-> intakeSubsystem.servoUpPosition());
 
         RunCommand defaultHorizontalSlideCommand = new RunCommand(() -> intakeSubsystem.runHorizontalSlides(operatorGamepad.getLeftY()));
@@ -94,12 +94,13 @@ public class Robot {
 
     public void run() {
         CommandScheduler.getInstance().run();
+        intakeSubsystem.updateHorizontalSlideDistance();
         
 
         opMode.telemetry.addData("Speed Multiplier",driveSubsystem.speedMultiplier);
         opMode.telemetry.addData("Y axis:", operatorGamepad.getLeftY());
         opMode.telemetry.addData("Is fieldcentric?",driveSubsystem.fieldCentric);
-        opMode.telemetry.addData("operator, arm thing: ",driveSubsystem.fieldCentric);
+        opMode.telemetry.addData("value: ", intakeSubsystem.getDistanceTraveled());
         opMode.telemetry.update();
     }
 

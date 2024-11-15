@@ -43,6 +43,8 @@ public abstract class Constants {
 
     public static final int INCH_TO_TILE = 24;
 
+    public static final double SLIDE_PULLEY_CIRCUMFERENCE = 5.0*0.393701*Math.PI;
+
     public static abstract class IntakeConstants{
         public static final String HORIZONTAL_SLIDE_LEFT_MOTOR_NAME = "horizontalSlideLeftMotor";
         public static final String HORIZONTAL_SLIDE_RIGHT_MOTOR_NAME = "horizontalSlideRightMotor";
@@ -56,8 +58,10 @@ public abstract class Constants {
         public static final double INTAKE_WRIST_SERVO_DOWN_POSITION = 180;
 
         public static final DcMotorSimple.Direction HORIZONTAL_SLIDE_LEFT_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
-        public static final DcMotorSimple.Direction HORIZONTAL_SLIDE_RIGHT_MOTOR_DIRECTION = DcMotorSimple.Direction.REVERSE;
-
+        public static final DcMotorSimple.Direction HORIZONTAL_SLIDE_RIGHT_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
+        /*why both motor do not need changing direction is bcz gear problem, imagine O is motor and 0 is the gear:
+        someone in build team can explain,but it works
+         */
 
     }
 

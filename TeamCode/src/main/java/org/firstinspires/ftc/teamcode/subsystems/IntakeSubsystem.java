@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -25,6 +26,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private double speedMultiplier = 1.0;
 
+    private double ticks;
+    private double distance_traveled;
+
+    private final OpMode opMode;
+
     private enum intakeSubsystemState{
         EXTENDING,
         GETTING_BLOCK,
@@ -33,10 +39,13 @@ public class IntakeSubsystem extends SubsystemBase {
         AT_BAY
     }
 
-    public IntakeSubsystem(HardwareMap hardwareMap){
+    public IntakeSubsystem(HardwareMap hardwareMap,OpMode opMode){
+        this.opMode= opMode;//a little fix so that the subsystem itself can add things into telemetry
+
         // intake arms motor creation
         horizontalSlideLeftMotor = hardwareMap.get(DcMotorEx.class,IntakeConstants.HORIZONTAL_SLIDE_LEFT_MOTOR_NAME);
         horizontalSlideRightMotor = hardwareMap.get(DcMotorEx.class,IntakeConstants.HORIZONTAL_SLIDE_RIGHT_MOTOR_NAME);
+
         // wrist servo creation
         wristServo = new SimpleServo(hardwareMap,IntakeConstants.INTAKE_WRIST_SERVO_NAME, IntakeConstants.INTAKE_WRIST_SERVO_MIN_ANGLE,IntakeConstants.INTAKE_WRIST_SERVO_MAX_ANGLE);
         activeIntakeServo = hardwareMap.get(CRServo.class, IntakeConstants.ACTIVE_INTAKE_SERVO_NAME);
@@ -51,6 +60,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
         resetEncoders();
 
+    }
+
+    public void updateHorizontalSlideDistance() {
+        ticks = horizontalSlideLeftMotor.getCurrentPosition();
     }
 
     public void resetEncoders() {
@@ -103,5 +116,10 @@ public class IntakeSubsystem extends SubsystemBase {
         } else{
             speedMultiplier = 1;
         }
+    }
+
+    public double getDistanceTraveled(){
+        distance_traveled = ticks/Constants.SLIDE_PULLEY_CIRCUMFERENCE;
+        return distance_traveled;
     }
 }
