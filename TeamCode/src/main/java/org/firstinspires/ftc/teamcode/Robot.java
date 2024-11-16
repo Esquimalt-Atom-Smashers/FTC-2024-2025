@@ -43,6 +43,15 @@ public class Robot {
         *   Reduce Speed -> right trigger
         *   Reset Gyro -> back button
         *   Enable/Disable Field Centric -> start button
+        *
+        * Operator:
+         *   Intake subsystem:
+         *      Extend horizontal slide to max + intake wrist down -> Y
+         *      Retract horizontal slide to min + intake wrist up -> A
+         *      Active intake in -> B(cont.)
+         *      Active intake out -> A(cont.)
+         *
+         *      reset horizontal slide encoder -> start
         */ 
 
         CommandScheduler.getInstance().reset();
@@ -63,26 +72,98 @@ public class Robot {
         Trigger setFieldCentric = new Trigger(() -> driverGamepad.getButton(GamepadKeys.Button.B));
         setFieldCentric.whenActive(() -> driveSubsystem.setFieldCentricOnOff());
 
-        // temporary setting just for testing purpose
-        // Intake bindings
+        // Intake bindings,revised
+
+        Trigger retractHorizontalSlide = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.A));
+        retractHorizontalSlide.whileActiveContinuous(()-> {intakeSubsystem.servoUpPosition();
+            intakeSubsystem.retractHorizontalSlides();});
+        retractHorizontalSlide.whenInactive(()-> intakeSubsystem.stopActiveIntakeServo());
+
+        Trigger extendHorizontalSlide = new Trigger(()-> operatorGamepad.getButton(GamepadKeys.Button.Y));
+        extendHorizontalSlide.whenActive(()->intakeSubsystem.extentHorizontalSlides());//servo down position after extended
+
+
+        Trigger activeIntakeIn = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.B));
+        activeIntakeIn.whileActiveContinuous(()-> intakeSubsystem.ActiveIntakeServoIn());
+        activeIntakeIn.whenInactive(()-> intakeSubsystem.stopActiveIntakeServo());
+
+        Trigger activeIntakeOut = new Trigger(()-> operatorGamepad.getButton(GamepadKeys.Button.X));
+        activeIntakeOut.whileActiveContinuous(()->intakeSubsystem.ActiveIntakeServoOut());
+        activeIntakeOut.whenInactive(()-> intakeSubsystem.stopActiveIntakeServo());
+
+        Trigger resetHorizontalSlideEncoder = new Trigger(()-> operatorGamepad.getButton(GamepadKeys.Button.START));
+        resetHorizontalSlideEncoder.whenActive(() -> intakeSubsystem.resetEncoders());
+
+    }
+
+    public void configureSubsystemTestingTeleOpBindings() {
+
+        /* Controls:
+         * Driver:
+         *   Forward -> left y axis
+         *   Strafe -> left x axis
+         *   Turn -> right x axis
+         *
+         *   Reduce Speed -> right trigger
+         *   Reset Gyro -> back button
+         *   Enable/Disable Field Centric -> start button
+         *
+         * Operator:
+         *   Intake subsystem:
+         *      Horizontal slide slow down/speed up ->left trigger(toggle)
+         *      Extend horizontal slide -> right y axis
+         *      Put intake wrist down -> right trigger(continuously)
+         *      Active intake in -> B(cont.)
+         *      Active intake out -> A(cont.)
+         *
+         *      reset horizontal slide encoders -> start
+         *
+         *
+         *
+         *
+         */
+
+        CommandScheduler.getInstance().reset();
+        CommandScheduler.getInstance().cancelAll();
+
+        RunCommand defaultDriveCommand = new RunCommand(() -> driveSubsystem.drive(driverGamepad.getLeftY(), driverGamepad.getLeftX(), driverGamepad.getRightX()));
+        defaultDriveCommand.addRequirements(driveSubsystem);
+
+        driveSubsystem.setDefaultCommand(defaultDriveCommand);
+
+        Trigger speedVariationTrigger = new Trigger(() -> isPressed(driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)));
+        speedVariationTrigger.whenActive(() -> driveSubsystem.changeSpeedMultiplier());//feedback from driver: changed the speed multiplier to left trigger and changed by toggle
+        //speedVariationTrigger.whenInactive(() -> driveSubsystem.setSpeedMultiplier(1));
+
+        Trigger resetGyro = new Trigger(() -> driverGamepad.getButton(GamepadKeys.Button.BACK));
+        resetGyro.whenActive(() -> driveSubsystem.resetGyro());
+
+        Trigger setFieldCentric = new Trigger(() -> driverGamepad.getButton(GamepadKeys.Button.B));
+        setFieldCentric.whenActive(() -> driveSubsystem.setFieldCentricOnOff());
+
+        // Intake bindings,revised
         Trigger horizontalSlideSpeedVariationTrigger = new Trigger(() -> isPressed(operatorGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)));
         horizontalSlideSpeedVariationTrigger.whenActive(() -> intakeSubsystem.changeHorizontalSlideSpeedMultiplier());
 
-        Trigger runActiveIntake = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.A));
-        runActiveIntake.whileActiveContinuous(()-> intakeSubsystem.runActiveIntakeServo());
-        runActiveIntake.whenInactive(()-> intakeSubsystem.stopActiveIntakeServo());
+        Trigger activeIntakeIn = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.B));
+        activeIntakeIn.whileActiveContinuous(() -> intakeSubsystem.ActiveIntakeServoIn());
+        activeIntakeIn.whenInactive(()-> intakeSubsystem.stopActiveIntakeServo());
 
-        Trigger turnIntakeWrist = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.B));
-        turnIntakeWrist.whileActiveContinuous(()-> intakeSubsystem.servoDownPosition());
+        Trigger activeIntakeOut = new Trigger(() ->operatorGamepad.getButton(GamepadKeys.Button.X));
+        activeIntakeOut.whileActiveContinuous(() -> intakeSubsystem.ActiveIntakeServoOut());
+        activeIntakeOut.whenInactive(()-> intakeSubsystem.stopActiveIntakeServo());
+
+        Trigger turnIntakeWrist = new Trigger(() -> isPressed(operatorGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)));
+        turnIntakeWrist.whileActiveContinuous(() -> intakeSubsystem.servoDownPosition());
         turnIntakeWrist.whenInactive(()-> intakeSubsystem.servoUpPosition());
 
-        RunCommand defaultHorizontalSlideCommand = new RunCommand(() -> intakeSubsystem.runHorizontalSlides(operatorGamepad.getLeftY()));
+        Trigger resetHorizontalSlideEncoder = new Trigger(()-> operatorGamepad.getButton(GamepadKeys.Button.START));
+        resetHorizontalSlideEncoder.whenActive(() -> intakeSubsystem.resetEncoders());
+
+        RunCommand defaultHorizontalSlideCommand = new RunCommand(() -> intakeSubsystem.runHorizontalSlides(operatorGamepad.getRightY()));
         defaultHorizontalSlideCommand.addRequirements(intakeSubsystem);
 
         intakeSubsystem.setDefaultCommand(defaultHorizontalSlideCommand);
-
-
-
     }
 
     public void configureAutoSetting(){

@@ -45,9 +45,20 @@ public abstract class Constants {
 
     public static final double SLIDE_PULLEY_CIRCUMFERENCE = 5.0*0.393701*Math.PI;
 
+    public static final double MOTOR_TICKS_PER_REVOLUTION = 751.8;
+
     public static abstract class IntakeConstants{
         public static final String HORIZONTAL_SLIDE_LEFT_MOTOR_NAME = "horizontalSlideLeftMotor";
         public static final String HORIZONTAL_SLIDE_RIGHT_MOTOR_NAME = "horizontalSlideRightMotor";
+
+        public static final DcMotorSimple.Direction HORIZONTAL_SLIDE_LEFT_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
+        public static final DcMotorSimple.Direction HORIZONTAL_SLIDE_RIGHT_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
+        /*why both motor do not need changing direction is bcz gear problem, imagine O is motor and 0 is the gear:
+        someone in build team can explain,but it works
+         */
+
+        public static final double MAXIMUM_FORWARD_EXTENSION = 42-5;//INCHES
+        public static final double MINIMUM_BACKWARD_EXTENSION = 0;
 
         public static final String ACTIVE_INTAKE_SERVO_NAME = "activeIntakeServo";
         public static final String INTAKE_WRIST_SERVO_NAME = "intakeWristServo";
@@ -57,11 +68,7 @@ public abstract class Constants {
         public static final double INTAKE_WRIST_SERVO_UP_POSITION = 0;
         public static final double INTAKE_WRIST_SERVO_DOWN_POSITION = 180;
 
-        public static final DcMotorSimple.Direction HORIZONTAL_SLIDE_LEFT_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
-        public static final DcMotorSimple.Direction HORIZONTAL_SLIDE_RIGHT_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
-        /*why both motor do not need changing direction is bcz gear problem, imagine O is motor and 0 is the gear:
-        someone in build team can explain,but it works
-         */
+
 
     }
 

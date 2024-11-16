@@ -26,8 +26,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private double speedMultiplier = 1.0;
 
-    private double ticks;
-    private double distance_traveled;
+    private double leftHorizontalSlideTicks;
+    private double rightHorizontalSlideTicks;
+    private double horizontalSlideMaximumDistanceTraveled;
+    private double horizontalSlideMinimumDistanceTraveled;
 
     private final OpMode opMode;
 
@@ -63,7 +65,8 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void updateHorizontalSlideDistance() {
-        ticks = horizontalSlideLeftMotor.getCurrentPosition();
+        leftHorizontalSlideTicks = horizontalSlideLeftMotor.getCurrentPosition();
+        rightHorizontalSlideTicks = horizontalSlideRightMotor.getCurrentPosition();
     }
 
     public void resetEncoders() {
@@ -76,6 +79,25 @@ public class IntakeSubsystem extends SubsystemBase {
         horizontalSlideRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
+    public void changeHorizontalSlideSpeedMultiplier(){
+        if(speedMultiplier == 1){
+            speedMultiplier = 0.1;
+        } else{
+            speedMultiplier = 1;
+        }
+    }
+
+    public double getDistanceTraveled(){
+        if(leftHorizontalSlideTicks >= rightHorizontalSlideTicks){
+            horizontalSlideMaximumDistanceTraveled = (leftHorizontalSlideTicks / Constants.MOTOR_TICKS_PER_REVOLUTION) * Constants.SLIDE_PULLEY_CIRCUMFERENCE;
+            horizontalSlideMinimumDistanceTraveled = (rightHorizontalSlideTicks / Constants.MOTOR_TICKS_PER_REVOLUTION) * Constants.SLIDE_PULLEY_CIRCUMFERENCE;
+        } else{
+            horizontalSlideMaximumDistanceTraveled = (rightHorizontalSlideTicks / Constants.MOTOR_TICKS_PER_REVOLUTION) * Constants.SLIDE_PULLEY_CIRCUMFERENCE;
+        }
+
+        return (horizontalSlideMaximumDistanceTraveled + horizontalSlideMinimumDistanceTraveled) / 2;
+    }
+
     /*
      * gets input from controllers and retracts/extends the arms
      */
@@ -83,13 +105,50 @@ public class IntakeSubsystem extends SubsystemBase {
 
         input = Math.abs(input) >= Constants.DriveConstants.DEADZONE ? input : 0;
 
+        if (horizontalSlideMaximumDistanceTraveled >= IntakeConstants.MAXIMUM_FORWARD_EXTENSION) {
+            input = -Math.abs(input);
+        }
+        if(horizontalSlideMinimumDistanceTraveled >= IntakeConstants.MINIMUM_BACKWARD_EXTENSION){
+            input = Math.abs(input);
+        }
+
         horizontalSlideLeftMotor.setPower(Range.clip(input, -1, 1) * speedMultiplier);
         horizontalSlideRightMotor.setPower(Range.clip(input, -1, 1) * speedMultiplier);
     }
 
-    public void runActiveIntakeServo(){
+    public void extentHorizontalSlides(){
+        while(horizontalSlideMaximumDistanceTraveled <= (IntakeConstants.MAXIMUM_FORWARD_EXTENSION - 2) ){
+            horizontalSlideLeftMotor.setPower(1);
+            horizontalSlideRightMotor.setPower(1);
+        }
+        while(horizontalSlideMaximumDistanceTraveled <= IntakeConstants.MAXIMUM_FORWARD_EXTENSION) {
+            horizontalSlideLeftMotor.setPower(0.2);
+            horizontalSlideRightMotor.setPower(0.2);
+            servoDownPosition();
+        }
+        horizontalSlideLeftMotor.setPower(0);
+        horizontalSlideRightMotor.setPower(0);
+    }
 
+    public void retractHorizontalSlides(){
+        while(horizontalSlideMaximumDistanceTraveled >= (IntakeConstants.MINIMUM_BACKWARD_EXTENSION + 2) ){
+            horizontalSlideLeftMotor.setPower(-1);
+            horizontalSlideRightMotor.setPower(-1);
+        }
+        while(horizontalSlideMaximumDistanceTraveled >= IntakeConstants.MINIMUM_BACKWARD_EXTENSION) {
+            horizontalSlideLeftMotor.setPower(-0.2);
+            horizontalSlideRightMotor.setPower(-0.2);
+        }
+        horizontalSlideLeftMotor.setPower(0);
+        horizontalSlideRightMotor.setPower(0);
+    }
+
+    public void ActiveIntakeServoIn(){
         activeIntakeServo.setPower(1.0);
+    }
+
+    public void ActiveIntakeServoOut(){
+        activeIntakeServo.setPower(-1.0);
     }
 
     public void stopActiveIntakeServo(){
@@ -110,16 +169,5 @@ public class IntakeSubsystem extends SubsystemBase {
         wristServo.turnToAngle(IntakeConstants.INTAKE_WRIST_SERVO_DOWN_POSITION);
     }
 
-    public void changeHorizontalSlideSpeedMultiplier(){
-        if(speedMultiplier == 1){
-            speedMultiplier = 0.1;
-        } else{
-            speedMultiplier = 1;
-        }
-    }
 
-    public double getDistanceTraveled(){
-        distance_traveled = ticks/Constants.SLIDE_PULLEY_CIRCUMFERENCE;
-        return distance_traveled;
-    }
 }
