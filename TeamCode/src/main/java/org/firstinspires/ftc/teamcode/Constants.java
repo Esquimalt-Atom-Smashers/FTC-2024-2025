@@ -59,6 +59,7 @@ public abstract class Constants {
 
         public static final double MAXIMUM_FORWARD_EXTENSION = 42-5;//INCHES
         public static final double MINIMUM_BACKWARD_EXTENSION = 0;
+        public static final int EXTENSION_TOLERANCE_INCHES = 2;
 
         public static final String ACTIVE_INTAKE_SERVO_NAME = "activeIntakeServo";
         public static final String INTAKE_WRIST_SERVO_NAME = "intakeWristServo";

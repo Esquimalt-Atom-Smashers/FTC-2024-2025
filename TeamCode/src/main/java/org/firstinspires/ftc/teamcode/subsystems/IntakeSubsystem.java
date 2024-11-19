@@ -108,7 +108,7 @@ public class IntakeSubsystem extends SubsystemBase {
         if (horizontalSlideMaximumDistanceTraveled >= IntakeConstants.MAXIMUM_FORWARD_EXTENSION) {
             input = -Math.abs(input);
         }
-        if(horizontalSlideMinimumDistanceTraveled >= IntakeConstants.MINIMUM_BACKWARD_EXTENSION){
+        if(horizontalSlideMinimumDistanceTraveled <= IntakeConstants.MINIMUM_BACKWARD_EXTENSION){
             input = Math.abs(input);
         }
 
@@ -116,16 +116,16 @@ public class IntakeSubsystem extends SubsystemBase {
         horizontalSlideRightMotor.setPower(Range.clip(input, -1, 1) * speedMultiplier);
     }
 
-    public void extentHorizontalSlides(){
-        while(horizontalSlideMaximumDistanceTraveled <= (IntakeConstants.MAXIMUM_FORWARD_EXTENSION - 2) ){
+    public void extentHorizontalSlides(){                                                               //Tolerance = 2
+        while(horizontalSlideMaximumDistanceTraveled <= (IntakeConstants.MAXIMUM_FORWARD_EXTENSION - IntakeConstants.EXTENSION_TOLERANCE_INCHES) ){
             horizontalSlideLeftMotor.setPower(1);
             horizontalSlideRightMotor.setPower(1);
         }
         while(horizontalSlideMaximumDistanceTraveled <= IntakeConstants.MAXIMUM_FORWARD_EXTENSION) {
             horizontalSlideLeftMotor.setPower(0.2);
             horizontalSlideRightMotor.setPower(0.2);
-            servoDownPosition();
         }
+        servoDownPosition();
         horizontalSlideLeftMotor.setPower(0);
         horizontalSlideRightMotor.setPower(0);
     }
