@@ -178,9 +178,9 @@ public class Robot {
         intakeSubsystem.updateHorizontalSlideDistance();
         
 
-        opMode.telemetry.addData("Speed Multiplier",driveSubsystem.speedMultiplier);
+        opMode.telemetry.addData("Speed Multiplier",driveSubsystem.getSpeedMultiplier());
         opMode.telemetry.addData("Y axis:", operatorGamepad.getLeftY());
-        opMode.telemetry.addData("Is fieldcentric?",driveSubsystem.fieldCentric);
+        opMode.telemetry.addData("Is fieldcentric?",driveSubsystem.getIsFieldCentric());
         opMode.telemetry.addData("value: ", intakeSubsystem.getDistanceTraveled());
         opMode.telemetry.update();
     }
