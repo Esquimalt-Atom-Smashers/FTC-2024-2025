@@ -49,19 +49,12 @@ public abstract class Constants {
     public static final double MOTOR_TICKS_PER_REVOLUTION = 751.8;
 
     public static abstract class IntakeConstants{
-        public static final String HORIZONTAL_SLIDE_LEFT_MOTOR_NAME = "horizontalSlideLeftMotor";
-        public static final String HORIZONTAL_SLIDE_RIGHT_MOTOR_NAME = "horizontalSlideRightMotor";
 
-        public static final DcMotorSimple.Direction HORIZONTAL_SLIDE_LEFT_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
-        public static final DcMotorSimple.Direction HORIZONTAL_SLIDE_RIGHT_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
-        /*why both motor do not need changing direction is bcz gear problem, imagine O is motor and 0 is the gear:
-        someone in build team can explain,but it works
-         */
-
-        public static final double MAXIMUM_FORWARD_EXTENSION = 42-5;//INCHES
-        public static final double MINIMUM_BACKWARD_EXTENSION = 0;
-        public static final int EXTENSION_TOLERANCE_INCHES = 2;
-
+        public static final String MASTER_ANGLE_MOTOR = "masterAngleMotor";
+        public static final String SLAVE_ANGLE_MOTOR = "slaveAngleMotor";
+        public static final String ARM_EXTENSION_MOTOR = "armExtensionMotor";
+        public static final String MASTER_ANGLE_MOTOR_PORTNAME = "to be determined";
+        public static final String SLAVE_ANGLE_MOTOR_PORTNAME = "to be determined";
         public static final String ACTIVE_INTAKE_SERVO_NAME = "activeIntakeServo";
         public static final String INTAKE_WRIST_SERVO_NAME = "intakeWristServo";
 
@@ -75,9 +68,6 @@ public abstract class Constants {
     }
 
     public static abstract class OuttakeConstants{
-        public static final String VERTICAL_SLIDE_LEFT_MOTOR_NAME = "verticalSlideLeftMotor";
-        public static final String VERTICAL_SLIDE_RIGHT_MOTOR_NAME = "verticalSlideRightMotor";
-
         public static final String PINCH_SERVO_NAME = "pinchServo";
         public static final String OUTTAKE_WRIST_SERVO_NAME = "outtakeWristServo";
     }

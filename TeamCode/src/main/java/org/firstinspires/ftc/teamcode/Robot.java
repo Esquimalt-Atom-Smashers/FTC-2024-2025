@@ -97,16 +97,9 @@ public class Robot {
          *
          * Operator:
          *   Intake subsystem:
-         *      Horizontal slide slow down/speed up ->left trigger(toggle)
-         *      Extend horizontal slide -> right y axis
          *      Put intake wrist down -> right trigger(continuously)
          *      Active intake in -> B(cont.)
          *      Active intake out -> A(cont.)
-         *
-         *      reset horizontal slide encoders -> start
-         *
-         *
-         *
          *
          */
 
@@ -129,8 +122,6 @@ public class Robot {
         setFieldCentric.whenActive(() -> driveSubsystem.setFieldCentricOnOff());
 
         // Intake bindings,revised
-        Trigger horizontalSlideSpeedVariationTrigger = new Trigger(() -> isPressed(operatorGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)));
-        horizontalSlideSpeedVariationTrigger.whenActive(() -> intakeSubsystem.changeHorizontalSlideSpeedMultiplier());
 
         Trigger activeIntakeIn = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.B));
         activeIntakeIn.whileActiveContinuous(() -> intakeSubsystem.ActiveIntakeServoIn());
