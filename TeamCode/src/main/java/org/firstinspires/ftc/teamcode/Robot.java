@@ -72,17 +72,6 @@ public class Robot {
         Trigger setFieldCentric = new Trigger(() -> driverGamepad.getButton(GamepadKeys.Button.B));
         setFieldCentric.whenActive(() -> driveSubsystem.setFieldCentricOnOff());
 
-        // Intake bindings,revised
-
-        Trigger retractHorizontalSlide = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.A));
-        retractHorizontalSlide.whileActiveContinuous(()-> {intakeSubsystem.servoUpPosition();
-            intakeSubsystem.retractHorizontalSlides();});
-        retractHorizontalSlide.whenInactive(()-> intakeSubsystem.stopActiveIntakeServo());
-
-        Trigger extendHorizontalSlide = new Trigger(()-> operatorGamepad.getButton(GamepadKeys.Button.Y));
-        extendHorizontalSlide.whenActive(()->intakeSubsystem.extentHorizontalSlides());//servo down position after extended
-
-
         Trigger activeIntakeIn = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.B));
         activeIntakeIn.whileActiveContinuous(()-> intakeSubsystem.ActiveIntakeServoIn());
         activeIntakeIn.whenInactive(()-> intakeSubsystem.stopActiveIntakeServo());
@@ -91,8 +80,6 @@ public class Robot {
         activeIntakeOut.whileActiveContinuous(()->intakeSubsystem.ActiveIntakeServoOut());
         activeIntakeOut.whenInactive(()-> intakeSubsystem.stopActiveIntakeServo());
 
-        Trigger resetHorizontalSlideEncoder = new Trigger(()-> operatorGamepad.getButton(GamepadKeys.Button.START));
-        resetHorizontalSlideEncoder.whenActive(() -> intakeSubsystem.resetEncoders());
 
     }
 
@@ -157,13 +144,6 @@ public class Robot {
         turnIntakeWrist.whileActiveContinuous(() -> intakeSubsystem.servoDownPosition());
         turnIntakeWrist.whenInactive(()-> intakeSubsystem.servoUpPosition());
 
-        Trigger resetHorizontalSlideEncoder = new Trigger(()-> operatorGamepad.getButton(GamepadKeys.Button.START));
-        resetHorizontalSlideEncoder.whenActive(() -> intakeSubsystem.resetEncoders());
-
-        RunCommand defaultHorizontalSlideCommand = new RunCommand(() -> intakeSubsystem.runHorizontalSlides(operatorGamepad.getRightY()));
-        defaultHorizontalSlideCommand.addRequirements(intakeSubsystem);
-
-        intakeSubsystem.setDefaultCommand(defaultHorizontalSlideCommand);
     }
 
     public void configureAutoSetting(){
@@ -175,7 +155,6 @@ public class Robot {
 
     public void run() {
         CommandScheduler.getInstance().run();
-        intakeSubsystem.updateHorizontalSlideDistance();
         
 
         opMode.telemetry.addData("Speed Multiplier",driveSubsystem.getSpeedMultiplier());
