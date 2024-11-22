@@ -57,6 +57,13 @@ public class IntakeSubsystem extends SubsystemBase {
     private double linearSlideTimeout;
     private PIDSubsystemState linearSlideState;
 
+    private double floorScanningCursor;
+
+    private IntakeConstants.IntakeSubsystemState currentState;
+
+    private boolean isFloorScanningMode;
+
+
 
 
     private final OpMode opMode;
@@ -90,9 +97,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
         armJointController = new PIDController(IntakeConstants.ARM_JOINT_P, IntakeConstants.ARM_JOINT_I, IntakeConstants.ARM_JOINT_D);
 
+        floorScanningCursor = 0;
+        isFloorScanningMode = false;
 
-        resetEncoders();
-
+        resetLinearSlideEncoders();
+        resetArmJointEncoders();
     }
 
     public void updateIntakeSubsystemDistance() {
@@ -102,18 +111,22 @@ public class IntakeSubsystem extends SubsystemBase {
         linearSlideMotorTicks = linearSlideMotor.getCurrentPosition();
     }
 
-    public void resetEncoders() {
+    public void resetLinearSlideEncoders() {
         // reset and stop arm motors
+        linearSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        linearSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void resetArmJointEncoders(){
         leftArmJointMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightArmJointMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        linearSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // start arm motors
         leftArmJointMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightArmJointMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        linearSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void changeIntakeSubsystemMotorSpeedMultiplier(){
@@ -176,7 +189,11 @@ public class IntakeSubsystem extends SubsystemBase {
                     armJointState = PIDSubsystemState.AT_TARGET;
                     leftArmJointMotor.setPower(0.0);
                     rightArmJointMotor.setPower(0.0);
-
+                if (armJointMaximumAngleRotated > IntakeConstants.ARM_JOINT_MAXIMUM_ANGLE_ROTATED || armJointMinimumAngleRotated < IntakeConstants.ARM_JOINT_MINIMUM_ANGLE_ROTATED){
+                    armJointState = PIDSubsystemState.AT_TARGET;
+                    leftArmJointMotor.setPower(0.0);
+                    rightArmJointMotor.setPower(0.0);
+                }
             }
         }
     }
@@ -195,25 +212,12 @@ public class IntakeSubsystem extends SubsystemBase {
         return false;
     }
 
-    public double getLinearSlideDistanceTraveled() {
-        linearSlideDistanceTraveled = (linearSlideMotorTicks / Constants.MOTOR_TICKS_PER_REVOLUTION) * IntakeConstants.LINEAR_SLIDE_PULLEY_CIRCUMFERENCE;
-
-        return linearSlideDistanceTraveled;
-    }
-
     /*
      * gets input from controllers and retracts/extends the arms
      */
-    public void runArmJoints(double input){
+    public void runArmJointsManually(double input){
 
         input = Math.abs(input) >= Constants.DriveConstants.DEADZONE ? input : 0;
-
-        if (armJointMaximumAngleRotated >= IntakeConstants.MAXIMUM_ANGLE_ROTATED) {
-            input = -Math.abs(input);
-        }
-        if(armJointMinimumAngleRotated <= IntakeConstants.MINIMUM_ANGLE_ROTATED){
-            input = Math.abs(input);
-        }
 
         leftArmJointMotor.setPower(Range.clip(input, -1, 1) * speedMultiplier);
         rightArmJointMotor.setPower(Range.clip(input, -1, 1) * speedMultiplier);
@@ -224,6 +228,12 @@ public class IntakeSubsystem extends SubsystemBase {
         input =Math.abs(input) >= Constants.DriveConstants.DEADZONE ? input : 0;
 
         linearSlideMotor.setPower(Range.clip(input, -1, 1) * speedMultiplier);
+    }
+
+    public double getLinearSlideDistanceTraveled() {
+        linearSlideDistanceTraveled = (linearSlideMotorTicks / Constants.MOTOR_TICKS_PER_REVOLUTION) * IntakeConstants.LINEAR_SLIDE_PULLEY_CIRCUMFERENCE;
+
+        return linearSlideDistanceTraveled;
     }
 
     /**
@@ -270,8 +280,13 @@ public class IntakeSubsystem extends SubsystemBase {
                     linearSlideState = PIDSubsystemState.AT_TARGET;
                     linearSlideMotor.setPower(0.0);
                 }
+            if (linearSlideDistanceTraveled > IntakeConstants.MAXIMUM_FORWARD_EXTENSION || linearSlideDistanceTraveled < IntakeConstants.MINIMUM_BACKWARD_EXTENSION) {
+                linearSlideMotor.setPower(0.0);
+                linearSlideState = PIDSubsystemState.AT_TARGET;
             }
-        }
+            }
+            }
+
 
 
     /**
@@ -327,5 +342,45 @@ public class IntakeSubsystem extends SubsystemBase {
         wristServo.turnToAngle(IntakeConstants.INTAKE_WRIST_SERVO_DOWN_POSITION);
     }
 
+    public void manualFloorScanningMode(double input){
+        if(isFloorScanningMode){
+            input =Math.abs(input) >= Constants.DriveConstants.DEADZONE ? input : 0;
+            this.floorScanningCursor = Range.clip(floorScanningCursor + input, IntakeConstants.FloorScanningMode.FLOOR_SCANNING_CURSOR_MINIMUM_LIMIT , IntakeConstants.FloorScanningMode.FLOOR_SCANNING_CURSOR_MAXIMUM_LIMIT);
+            floorScanningMode();
+        }
+    }
 
+    public void floorScanningMode(){
+        double angleOfDepression = Math.toDegrees(Math.atan(IntakeConstants.FloorScanningMode.ARM_JOINT_AXIS_HEIGHT_FROM_FLOOR/floorScanningCursor));
+        wristServo.turnToAngle(angleOfDepression);
+        runArmJointWithPID(-angleOfDepression,3);
+        runLinearSlideWithPID(IntakeConstants.FloorScanningMode.ARM_JOINT_AXIS_HEIGHT_FROM_FLOOR / Math.sin(Math.toRadians(angleOfDepression)), 5);
+
+
+    }
+
+    public void changeState(Constants.IntakeConstants.IntakeSubsystemState subsystemState){
+        currentState = subsystemState;
+        switch (currentState){
+            case FLOOR_SCANNING_MODE:
+                floorScanningCursor = 0.0;
+                isFloorScanningMode = true;
+            case HIGH_BASKET_POSITION:
+                wristServo.turnToAngle(IntakeConstants.intakeControl.HIGH_BASKET_POSITION_WRIST_ANGLE);
+                runLinearSlideWithPID(IntakeConstants.intakeControl.HIGH_BASKET_POSITION_LINEAR_SLIDE_LENGTH,IntakeConstants.intakeControl.LINEAR_SLIDE_PID_TIMEOUT);
+                runArmJointWithPID(IntakeConstants.intakeControl.HIGH_BASKET_POSITION_ARM_JOINT_ANGLE,IntakeConstants.intakeControl.ARM_JOINT_PID_TIMEOUT);
+            case GET_SPECIMEN_POSITION:
+                wristServo.turnToAngle(IntakeConstants.intakeControl.GET_SPECIMEN_POSITION_WRIST_ANGLE);
+                runLinearSlideWithPID(IntakeConstants.intakeControl.GET_SPECIMEN_POSITION_LINEAR_SLIDE_LENGTH, IntakeConstants.intakeControl.LINEAR_SLIDE_PID_TIMEOUT);
+                runArmJointWithPID(IntakeConstants.intakeControl.GET_SPECIMEN_POSITION_ARM_JOINT_ANGLE,IntakeConstants.intakeControl.ARM_JOINT_PID_TIMEOUT);
+            case HANG_SPECIMEN_POSITION:
+                wristServo.turnToAngle(IntakeConstants.intakeControl.HANG_SPECIMEN_POSITION_WRIST_ANGLE);
+                runLinearSlideWithPID(IntakeConstants.intakeControl.HANG_SPECIMEN_POSITION_LINEAR_SLIDE_LENGTH,IntakeConstants.intakeControl.LINEAR_SLIDE_PID_TIMEOUT);
+                runArmJointWithPID(IntakeConstants.intakeControl.HANG_SPECIMEN_POSITION_ARM_JOINT_ANGLE,IntakeConstants.intakeControl.ARM_JOINT_PID_TIMEOUT);
+            case AT_BAY:
+                wristServo.turnToAngle(IntakeConstants.intakeControl.AT_BAY_WRIST_ANGLE);
+                runLinearSlideWithPID(IntakeConstants.intakeControl.AT_BAY_LINEAR_SLIDE_LENGTH,IntakeConstants.intakeControl.LINEAR_SLIDE_PID_TIMEOUT);
+                runArmJointWithPID(IntakeConstants.intakeControl.AT_BAY_ARM_JOINT_ANGLE,IntakeConstants.intakeControl.ARM_JOINT_PID_TIMEOUT);
+        }
+    }
 }
