@@ -6,6 +6,17 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 
 public abstract class Constants {
 
+    //miscellaneous
+    public static final int INCH_TO_TILE = 24;
+
+    public static final double MOTOR_TICKS_PER_REVOLUTION = 751.8;
+
+    public enum PIDSubsystemState {
+        MANUAL,
+        MOVING_TO_TARGET,
+        AT_TARGET
+    }
+
     public static abstract class DriveConstants {
         public static final String FRONT_LEFT_MOTOR_NAME = "frontLeftMotor";
         public static final String FRONT_RIGHT_MOTOR_NAME = "frontRightMotor";
@@ -41,21 +52,30 @@ public abstract class Constants {
         public static final double DEADZONE = 0.1;
     }
 
-    public static final int INCH_TO_TILE = 24;
-
-    public static final double SLIDE_PULLEY_CIRCUMFERENCE = 5.0*0.393701*Math.PI;
-
-    public static final double MOTOR_TICKS_PER_REVOLUTION = 751.8;
-
     public static abstract class IntakeConstants{
         public static final String HORIZONTAL_SLIDE_LEFT_MOTOR_NAME = "horizontalSlideLeftMotor";
         public static final String HORIZONTAL_SLIDE_RIGHT_MOTOR_NAME = "horizontalSlideRightMotor";
 
         public static final DcMotorSimple.Direction HORIZONTAL_SLIDE_LEFT_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
-        public static final DcMotorSimple.Direction HORIZONTAL_SLIDE_RIGHT_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
-        /*why both motor do not need changing direction is bcz gear problem, imagine O is motor and 0 is the gear:
-        someone in build team can explain,but it works
-         */
+        public static final DcMotorSimple.Direction HORIZONTAL_SLIDE_RIGHT_MOTOR_DIRECTION = DcMotorSimple.Direction.REVERSE;
+
+
+        public static final double MAXIMUM_ANGLE_ROTATED = 200;//degrees
+        public static final double MINIMUM_ANGLE_ROTATED = 0;//Assume the robot starts at down position
+
+        public static final double ARM_JOINT_P = 1;
+        public static final double ARM_JOINT_I = 1;
+        public static final double ARM_JOINT_D = 1;
+        public static final double ARM_JOINT_PID_POWER_TOLERANCE = 0.01;//inches
+
+        public static final String LINEAR_SLIDE_MOTOR_NAME = "linearSlideMotor";
+        public static final DcMotorSimple.Direction LINEAR_SLIDE_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
+        public static final double LINEAR_SLIDE_PULLEY_CIRCUMFERENCE = 1 * Math.PI;//inches
+
+        public static final double LINEAR_SLIDE_P = 1;
+        public static final double LINEAR_SLIDE_I = 1;
+        public static final double LINEAR_SLIDE_D = 1;
+        public static final double LINEAR_SLIDE_PID_POWER_TOLERANCE = 0.01;//inches
 
         public static final double MAXIMUM_FORWARD_EXTENSION = 42-5;//INCHES
         public static final double MINIMUM_BACKWARD_EXTENSION = 0;
