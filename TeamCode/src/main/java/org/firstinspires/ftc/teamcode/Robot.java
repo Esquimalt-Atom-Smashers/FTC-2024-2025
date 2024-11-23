@@ -18,6 +18,7 @@ public class Robot {
 
     private final DriveSubsystem driveSubsystem;
 
+    boolean lastButtonState = false;
     public Robot(OpMode opMode) {
         this.opMode = opMode;
 
@@ -42,25 +43,33 @@ public class Robot {
         CommandScheduler.getInstance().reset();
         CommandScheduler.getInstance().cancelAll();
 
+        boolean currentButtonState = driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > Constants.DriveConstants.DEADZONE;
+
         RunCommand defaultDriveCommand = new RunCommand(() -> driveSubsystem.drive(driverGamepad.getLeftY(), driverGamepad.getLeftX(), driverGamepad.getRightX()));
         defaultDriveCommand.addRequirements(driveSubsystem);
 
         driveSubsystem.setDefaultCommand(defaultDriveCommand);
 
-        Trigger speedVariationTrigger = new Trigger(() -> isPressed(driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)));
-        speedVariationTrigger.whileActiveContinuous(() -> driveSubsystem.setSpeedMultiplier(Math.abs(driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) - 1) * 0.4 + 0.2));
-        speedVariationTrigger.whenInactive(() -> driveSubsystem.setSpeedMultiplier(1));
+        if (currentButtonState && !lastButtonState) {
+            Trigger speedVariationTrigger = new Trigger(() -> isPressed(driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)));
+            speedVariationTrigger.whileActiveContinuous(() -> driveSubsystem.setSpeedMultiplier(Math.abs(driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) - 1) * 0.4 + 0.2));
+            speedVariationTrigger.whenInactive(() -> driveSubsystem.setSpeedMultiplier(1));
+        }
 
         Trigger resetGyro = new Trigger(() -> driverGamepad.getButton(GamepadKeys.Button.BACK));
         resetGyro.whenActive(() -> driveSubsystem.resetGyro());
 
         Trigger setFieldCentric = new Trigger(() -> driverGamepad.getButton(GamepadKeys.Button.START));
         setFieldCentric.whenActive(() -> driveSubsystem.setFieldCentricOnOff());
+
+        lastButtonState = currentButtonState;
     }
 
     public void run() {
         CommandScheduler.getInstance().run();
         opMode.telemetry.addData("Y axis:", driverGamepad.getLeftY());
+        opMode.telemetry.addData("back left:", driveSubsystem.backLeftMotor.getPower());
+        opMode.telemetry.addData("back right:", driveSubsystem.backRightMotor.getPower());
         opMode.telemetry.update();
     }
 
