@@ -105,8 +105,8 @@ public class Robot {
        intake.whenInactive(() -> intakeSubsystem.stopIntakeServo());
 
        Trigger outtake = new Trigger(() -> operatorGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > Constants.DriveConstants.DEADZONE);
-       intake.whenActive(() -> intakeSubsystem.outtake());
-       intake.whenInactive(() -> intakeSubsystem.stopIntakeServo());
+       outtake.whenActive(() -> intakeSubsystem.outtake());
+       outtake.whenInactive(() -> intakeSubsystem.stopIntakeServo());
 
        Trigger goHome = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.DPAD_LEFT));
        goHome.whenActive(new SequentialCommandGroup(
