@@ -1,14 +1,13 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utils.GamepadUtils;
@@ -25,6 +24,11 @@ public class LinearSlideSubsystem extends SubsystemBase {
     private final PIDController controller;
 
     private int targetPosition;
+    private boolean operatorOverride;
+
+    private ElapsedTime elapsedTime;
+    double timeOut = 2; //seconds
+
 
     public LinearSlideSubsystem(OpMode opMode) {
         this.opMode = opMode;
@@ -41,16 +45,30 @@ public class LinearSlideSubsystem extends SubsystemBase {
 
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        operatorOverride = false;
+
+        elapsedTime = new ElapsedTime();
+        elapsedTime.reset();
     }
 
-    public void runPIDPosition(int targetPosition) {
-        this.targetPosition = targetPosition;
+    public void runPIDPosition() {
+
         if(motor.getCurrentPosition() > targetPosition - 5 && motor.getCurrentPosition() < targetPosition + 5) {
             motor.setPower(0);
             return;
         }
-        telemetry.addData("Power to motors:", controller.calculate(motor.getCurrentPosition(), targetPosition));
-        motor.setPower(controller.calculate(motor.getCurrentPosition(), targetPosition));
+        double outputPower = controller.calculate(motor.getCurrentPosition(), targetPosition);
+        telemetry.addData("Power to motors:", outputPower);
+
+
+        if(outputPower > 0.6) {
+            if (elapsedTime.seconds() > timeOut) {
+                motor.setPower(Constants.IntakeConstants.PID_SAFE_POWER);}
+            else { motor.setPower(outputPower); }
+        }else {
+            elapsedTime.reset();
+        }
     }
 
     /** Takes the input from a controller and converts it into a plus or minus targetposition based on the previous target position.
@@ -90,9 +108,9 @@ public class LinearSlideSubsystem extends SubsystemBase {
 
         @Override
         public void execute() {
-            linearSlideSubsystem.telemetry.addData("Target position", linearSlideSubsystem.getTargetPosition());
-            linearSlideSubsystem.telemetry.addData("Current position", linearSlideSubsystem.getCurrentPosition());
-            linearSlideSubsystem.runPIDPosition(linearSlideSubsystem.getTargetPosition());
+            linearSlideSubsystem.telemetry.addData("Slide Target position", linearSlideSubsystem.getTargetPosition());
+            linearSlideSubsystem.telemetry.addData("Slide Current position", linearSlideSubsystem.getCurrentPosition());
+            linearSlideSubsystem.runPIDPosition();
         }
     }
 }

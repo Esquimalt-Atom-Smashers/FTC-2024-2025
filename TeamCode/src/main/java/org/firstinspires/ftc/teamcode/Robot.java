@@ -59,6 +59,11 @@ public class Robot {
        *    Go to start from outtaking -> down d-pad
        */
 
+
+
+//TODO to be determined: operator command override button
+
+
        CommandScheduler.getInstance().reset();
        CommandScheduler.getInstance().cancelAll();
 
@@ -133,5 +138,7 @@ public class Robot {
        opMode.telemetry.addData("Elbow Current Position:", elbowSubsystem.getCurrentPosition());
        opMode.telemetry.addData("Wrist Current Position:", intakeSubsystem.getCurrentPosition());
        opMode.telemetry.update();
+
+
    }
 }
