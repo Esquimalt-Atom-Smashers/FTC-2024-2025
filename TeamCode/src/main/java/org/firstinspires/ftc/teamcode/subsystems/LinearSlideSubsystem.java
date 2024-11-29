@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utils.GamepadUtils;
@@ -54,20 +55,22 @@ public class LinearSlideSubsystem extends SubsystemBase {
 
     public void runPIDPosition() {
 
-        if(motor.getCurrentPosition() > targetPosition - 5 && motor.getCurrentPosition() < targetPosition + 5) {
+        /*if(motor.getCurrentPosition() > targetPosition - 5 && motor.getCurrentPosition() < targetPosition + 5) {
             motor.setPower(0);
             return;
-        }
+        }*/
         double outputPower = controller.calculate(motor.getCurrentPosition(), targetPosition);
         telemetry.addData("Power to motors:", outputPower);
 
 
-        if(outputPower > 0.6) {
+        if(Math.abs(outputPower) > 0.6 ) {
             if (elapsedTime.seconds() > timeOut) {
-                motor.setPower(Constants.IntakeConstants.PID_SAFE_POWER);}
+                motor.setPower(Constants.IntakeConstants.PID_SAFE_POWER);
+                telemetry.addLine("slide timeout triggered"); }
             else { motor.setPower(outputPower); }
         }else {
             elapsedTime.reset();
+            motor.setPower(outputPower);
         }
     }
 
@@ -88,9 +91,7 @@ public class LinearSlideSubsystem extends SubsystemBase {
     }
 
     public void setTargetPosition(int targetPosition) {
-        if(targetPosition > Constants.IntakeConstants.MAXIMUM_SLIDE_POS) this.targetPosition = Constants.IntakeConstants.MAXIMUM_SLIDE_POS;
-        if(targetPosition < Constants.IntakeConstants.MINIMUM_SLIDE_POS) this.targetPosition = Constants.IntakeConstants.MINIMUM_SLIDE_POS;
-        this.targetPosition = targetPosition;
+        this.targetPosition = Range.clip(targetPosition, Constants.IntakeConstants.MINIMUM_SLIDE_POS, Constants.IntakeConstants.MAXIMUM_SLIDE_POS);
     }
 
     public int getCurrentPosition() {
