@@ -4,6 +4,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.arcrobotics.ftclib.command.SubsystemBase;
@@ -11,17 +12,18 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.hardware.bosch.BHI260IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import java.lang.Math;
 
 import org.firstinspires.ftc.teamcode.*;
+import org.firstinspires.ftc.teamcode.utils.GamepadUtils;
 
-//TODO: Modify drive functions to make use of new odometry logic rather than IMU
-
-//TODO: Fix deadzone logic to use quadratic equation
+//TODO: Modify drive functions to make use of new odometry logic rather than IMU (check if it is actually more accurate first)
 
 public class DriveSubsystem extends SubsystemBase {
-
-    private HardwareMap hardwareMap;
+    private final HardwareMap hardwareMap;
+    private final OpMode opMode;
+    private final Telemetry telemetry;
 
     private final DcMotorEx frontLeftMotor;
     private final DcMotorEx frontRightMotor;
@@ -33,8 +35,10 @@ public class DriveSubsystem extends SubsystemBase {
     private double speedMultiplier = 1.0;
     private boolean fieldCentric = true;
 
-    public DriveSubsystem(HardwareMap hardwareMap) {
-        this.hardwareMap = hardwareMap;
+    public DriveSubsystem(OpMode opMode) {
+        this.opMode = opMode;
+        this.hardwareMap = opMode.hardwareMap;
+        this.telemetry = opMode.telemetry;
         
         imu = hardwareMap.get(BHI260IMU.class, Constants.DriveConstants.IMU_NAME);
         imu.initialize(Constants.DriveConstants.IMU_PARAMETERS);
@@ -59,15 +63,14 @@ public class DriveSubsystem extends SubsystemBase {
     }
     
     public void drive(double forward, double strafe, double turn) {
-        if(fieldCentric) driveFieldCentric(forward, strafe, turn); else driveRobotCentric(forward, strafe, turn);
+        if(fieldCentric) driveFieldCentric(forward, strafe, turn);
+        else driveRobotCentric(forward, strafe, turn);
     }
 
     private void driveFieldCentric(double forward, double strafe, double turn) {
-        turn = -turn;
-
-        forward = Math.abs(forward) >= Constants.DriveConstants.DEADZONE ? forward : 0;
-        strafe = Math.abs(strafe) >= Constants.DriveConstants.DEADZONE ? strafe : 0;
-        turn = Math.abs(turn) >= Constants.DriveConstants.DEADZONE ? turn : 0;
+        forward = GamepadUtils.deadzone(forward, Constants.DriveConstants.DEADZONE);
+        strafe = GamepadUtils.deadzone(strafe, Constants.DriveConstants.DEADZONE);
+        turn = GamepadUtils.deadzone(turn, Constants.DriveConstants.DEADZONE);
 
         double gyroRadians = Math.toRadians(-getHeading());
         double fieldCentricStrafe = strafe * Math.cos(gyroRadians) - forward * Math.sin(gyroRadians);
@@ -80,11 +83,9 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     private void driveRobotCentric(double forward, double strafe, double turn) {
-        turn = -turn;
-
-        forward = Math.abs(forward) >= Constants.DriveConstants.DEADZONE ? forward : 0;
-        strafe = Math.abs(strafe) >= Constants.DriveConstants.DEADZONE ? strafe : 0;
-        turn = Math.abs(turn) >= Constants.DriveConstants.DEADZONE ? turn : 0;
+        forward = GamepadUtils.deadzone(forward, Constants.DriveConstants.DEADZONE);
+        strafe = GamepadUtils.deadzone(strafe, Constants.DriveConstants.DEADZONE);
+        turn = GamepadUtils.deadzone(turn, Constants.DriveConstants.DEADZONE);
 
         frontLeftMotor.setPower(Range.clip((forward + strafe + turn), -1, 1) * speedMultiplier);
         frontRightMotor.setPower(Range.clip((forward - strafe - turn), -1, 1) * speedMultiplier);
@@ -110,13 +111,21 @@ public class DriveSubsystem extends SubsystemBase {
         backLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        frontLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
+        frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+   }
 
     private double getHeading() {
         return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+    }
+
+    public double getSpeedMultiplier() {
+        return speedMultiplier;
+    }
+
+    public boolean getIsFieldCentric() {
+        return fieldCentric;
     }
 }
