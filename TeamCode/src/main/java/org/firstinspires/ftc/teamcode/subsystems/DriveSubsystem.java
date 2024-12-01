@@ -27,8 +27,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     private final DcMotorEx frontLeftMotor;
     private final DcMotorEx frontRightMotor;
-    private final DcMotorEx backLeftMotor;
-    private final DcMotorEx backRightMotor;
+    public final DcMotorEx backLeftMotor;
+    public final DcMotorEx backRightMotor;
 
     private final BHI260IMU imu;
 

@@ -138,7 +138,5 @@ public class Robot {
        opMode.telemetry.addData("Elbow Current Position:", elbowSubsystem.getCurrentPosition());
        opMode.telemetry.addData("Wrist Current Position:", intakeSubsystem.getCurrentPosition());
        opMode.telemetry.update();
-
-
    }
 }
