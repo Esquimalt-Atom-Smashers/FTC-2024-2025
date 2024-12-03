@@ -24,6 +24,8 @@ public class Robot {
    private final ElbowSubsystem elbowSubsystem;
    private final LinearSlideSubsystem linearSlideSubsystem;
 
+   private ElapsedTime autoTimer;
+
    public Robot(OpMode opMode) {
        this.opMode = opMode;
 
@@ -34,6 +36,8 @@ public class Robot {
        intakeSubsystem = new IntakeSubsystem(opMode);
        elbowSubsystem = new ElbowSubsystem(opMode);
        linearSlideSubsystem = new LinearSlideSubsystem(opMode);
+
+       autoTimer = new ElapsedTime();
    }
 
    public void configureTeleOpBindings() {
@@ -138,7 +142,16 @@ public class Robot {
        opMode.telemetry.addData("Elbow Current Position:", elbowSubsystem.getCurrentPosition());
        opMode.telemetry.addData("Wrist Current Position:", intakeSubsystem.getCurrentPosition());
        opMode.telemetry.update();
+   }
 
+   public void autoModeDrive(double forward, double strafe, double rotate, double duration){
+       driveSubsystem.drive(forward, strafe, rotate);
+
+       autoTimer.reset();
+
+       if( autoTimer.seconds() == duration) {
+           driveSubsystem.drive(0, 0, 0);
+       }
 
    }
 }

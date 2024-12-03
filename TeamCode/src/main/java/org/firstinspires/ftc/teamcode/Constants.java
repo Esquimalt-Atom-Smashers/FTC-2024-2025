@@ -102,8 +102,6 @@ public abstract class Constants {
         public static final double WRIST_OUTTAKE_POS = 0;
         public static final double WRIST_INTAKE_POS = 0.35;
 
-        public static final double PID_SAFE_POWER = 0.0;
-
         public static class FloorScanningMode {
             public static final double MINIMUM_FLOOR_SCANNING_REGRESSION_ANGLE = -1; //DEGREES
             public static final double MAXIMUM_FLOOR_SCANNING_REGRESSION_ANGLE = -1;
