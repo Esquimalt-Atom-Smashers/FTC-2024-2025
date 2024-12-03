@@ -2,6 +2,7 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.acmerobotics.roadrunner.Action;
@@ -20,11 +21,12 @@ public class DrivebaseAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         Robot robot = new Robot(this);
-        robot.configureAutoSetting();
+
+        CommandScheduler.getInstance().reset();
+        CommandScheduler.getInstance().cancelAll();
 
 
         int allianceNumber = 1;//blue = 1, red = -1
-
 
         //tell the bot where it starts
         Pose2d initialPose = new Pose2d(-3 * Constants.INCH_TO_TILE * allianceNumber, 1.5 * Constants.INCH_TO_TILE * allianceNumber, Math.toRadians(90 * allianceNumber));
