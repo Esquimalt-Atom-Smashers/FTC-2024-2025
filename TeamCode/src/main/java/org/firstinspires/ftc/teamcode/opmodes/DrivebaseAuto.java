@@ -58,9 +58,6 @@ public class DrivebaseAuto extends LinearOpMode {
         //to be tested
         while (opModeIsActive() && !isStopRequested()) {
             robot.run();
-
-
-
             drive.updatePoseEstimate();//show where the bot think itself at
 
             telemetry.addData("x", drive.pose.position.x);
@@ -85,17 +82,10 @@ public class DrivebaseAuto extends LinearOpMode {
             chosenParkingAction = parkObzone.build();
         }
 
-
-
         Actions.runBlocking(
                 new SequentialAction(
                         chosenGettingBlockAction,
                         chosenParkingAction
-
                 ));//execute the planned action
-
-
-
     }
-
 }
