@@ -1,5 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.Trigger;
@@ -11,6 +18,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.roadrunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.*;
 
 public class Robot {
@@ -24,6 +33,9 @@ public class Robot {
    private final ElbowSubsystem elbowSubsystem;
    private final LinearSlideSubsystem linearSlideSubsystem;
 
+   private ElapsedTime autoTimer;
+   private MecanumDrive roadrunnerDrive;
+
    public Robot(OpMode opMode) {
        this.opMode = opMode;
 
@@ -34,6 +46,8 @@ public class Robot {
        intakeSubsystem = new IntakeSubsystem(opMode);
        elbowSubsystem = new ElbowSubsystem(opMode);
        linearSlideSubsystem = new LinearSlideSubsystem(opMode);
+
+       autoTimer = new ElapsedTime();
    }
 
    public void configureTeleOpBindings() {
@@ -58,12 +72,7 @@ public class Robot {
        *    Go to outtake position -> up d-pad
        *    Go to start from outtaking -> down d-pad
        */
-
-
-
 //TODO to be determined: operator command override button
-
-
        CommandScheduler.getInstance().reset();
        CommandScheduler.getInstance().cancelAll();
 
@@ -132,6 +141,13 @@ public class Robot {
        ));
    }
 
+   public void configureAutonomous(MecanumDrive roadrunnerDrive){
+       this.roadrunnerDrive = roadrunnerDrive;
+
+       CommandScheduler.getInstance().reset();
+       CommandScheduler.getInstance().cancelAll();
+   }
+
    public void run() {
        CommandScheduler.getInstance().run();
        opMode.telemetry.addData("Linear Slide Position:", linearSlideSubsystem.getCurrentPosition());
@@ -139,4 +155,28 @@ public class Robot {
        opMode.telemetry.addData("Wrist Current Position:", intakeSubsystem.getCurrentPosition());
        opMode.telemetry.update();
    }
+
+   public void autoModeDrive(double forward, double strafe, double rotate, double duration){
+       driveSubsystem.drive(forward, strafe, rotate);
+       autoTimer.reset();
+
+       if( autoTimer.seconds() == duration) {
+           driveSubsystem.drive(0, 0, 0);
+       }
+   }
+
+    public class roadrunnerUpdatePose implements Action {
+        public boolean run(@NonNull TelemetryPacket packet) {
+            telemetry.addData("x", roadrunnerDrive.pose.position.x);
+            telemetry.addData("y", roadrunnerDrive.pose.position.y);
+            telemetry.addData("heading (deg)", Math.toDegrees(roadrunnerDrive.pose.heading.toDouble()));
+            telemetry.update();
+
+            return true;
+        }
+    }
+
+    public Action roadrunnerUpdatePose() {
+        return new roadrunnerUpdatePose();
+    }
 }

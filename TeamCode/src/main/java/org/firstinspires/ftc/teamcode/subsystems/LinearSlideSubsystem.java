@@ -55,17 +55,13 @@ public class LinearSlideSubsystem extends SubsystemBase {
 
     public void runPIDPosition() {
 
-        /*if(motor.getCurrentPosition() > targetPosition - 5 && motor.getCurrentPosition() < targetPosition + 5) {
-            motor.setPower(0);
-            return;
-        }*/
         double outputPower = controller.calculate(motor.getCurrentPosition(), targetPosition);
         telemetry.addData("Power to motors:", outputPower);
 
 
         if(Math.abs(outputPower) > 0.6 ) {
             if (elapsedTime.seconds() > timeOut) {
-                motor.setPower(Constants.IntakeConstants.PID_SAFE_POWER);
+                motor.setPower(0);
                 telemetry.addLine("slide timeout triggered"); }
             else { motor.setPower(outputPower); }
         }else {
