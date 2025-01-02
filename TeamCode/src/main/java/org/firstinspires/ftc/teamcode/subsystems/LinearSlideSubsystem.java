@@ -15,16 +15,16 @@ import org.firstinspires.ftc.teamcode.utils.GamepadUtils;
 
 public class LinearSlideSubsystem extends SubsystemBase {
     //CONSTANTS
-    private static final String LINEAR_SLIDE_MOTOR_NAME = "linearSlideMotor";
-    private static final DcMotorSimple.Direction LINEAR_SLIDE_MOTOR_DIRECTION = DcMotorSimple.Direction.REVERSE;
-    private static final int LINEAR_STARTING_POS = 0;
-    private static final double LINEAR_SLIDE_P = 0.005;
-    private static final double LINEAR_SLIDE_I = 0;
-    private static final double LINEAR_SLIDE_D = 0;
-    private static final double PID_SAFE_POWER = 0.0;
-    private static final double DEADZONE = 0.1;
-    private static final int MINIMUM_SLIDE_POS = 0;
-    private static final int MAXIMUM_SLIDE_POS = 2900;
+    static final int MANUAL_CONTROL_RATE = 25;
+    static final String LINEAR_SLIDE_MOTOR_NAME = "linearSlideMotor";
+    static final DcMotorSimple.Direction LINEAR_SLIDE_MOTOR_DIRECTION = DcMotorSimple.Direction.REVERSE;
+    static final int LINEAR_STARTING_POS = 0;
+    static final double LINEAR_SLIDE_P = 0.005;
+    static final double LINEAR_SLIDE_I = 0;
+    static final double LINEAR_SLIDE_D = 0;
+    static final double PID_SAFE_POWER = 0.0;
+    static final int MINIMUM_SLIDE_POS = 0;
+    static final int MAXIMUM_SLIDE_POS = 2900;
 
     private final DcMotorEx motor;
 
@@ -64,21 +64,15 @@ public class LinearSlideSubsystem extends SubsystemBase {
     }
 
     public void runPIDPosition() {
-
-        /*if(motor.getCurrentPosition() > targetPosition - 5 && motor.getCurrentPosition() < targetPosition + 5) {
-            motor.setPower(0);
-            return;
-        }*/
         double outputPower = controller.calculate(motor.getCurrentPosition(), targetPosition);
         telemetry.addData("Power to motors:", outputPower);
-
 
         if(Math.abs(outputPower) > 0.6 ) {
             if (elapsedTime.seconds() > timeOut) {
                 motor.setPower(PID_SAFE_POWER);
                 telemetry.addLine("slide timeout triggered"); }
-            else { motor.setPower(outputPower); }
-        }else {
+            else motor.setPower(outputPower); 
+        } else {
             elapsedTime.reset();
             motor.setPower(outputPower);
         }
@@ -91,7 +85,7 @@ public class LinearSlideSubsystem extends SubsystemBase {
      * @return Position (ticks)
      */
     public int convertStickToTarget(double input, int rate) {
-        input = GamepadUtils.deadzone(input, DEADZONE);
+        input = GamepadUtils.deadzone(input);
         telemetry.addData("Target Position:", (int) (input * rate + targetPosition));
         return (int) (input * rate + targetPosition);
     }

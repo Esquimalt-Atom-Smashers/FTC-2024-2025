@@ -13,17 +13,17 @@ import org.firstinspires.ftc.teamcode.utils.GamepadUtils;
 
 public class ElbowSubsystem extends SubsystemBase {
     //CONSTANTS
-    private static final String LEFT_ARM_MOTOR_NAME = "leftArmJointMotor";
-    private static final String RIGHT_ARM_MOTOR_NAME = "rightArmJointMotor";
-    private static final DcMotorSimple.Direction LEFT_ARM_MOTOR_DIRECTION = DcMotorSimple.Direction.REVERSE;
-    private static final DcMotorSimple.Direction RIGHT_ARM_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
-    private static final double ARM_JOINT_P = 0.0088;
-    private static final double ARM_JOINT_I = 0;
-    private static final double ARM_JOINT_D = 0.00017;
-    private static final int ELBOW_STARTING_POS = 115;
-    private static final double DEADZONE = 0.1;
-    private static final int MAXIMUM_ELBOW_POS = 770;
-    private static final int MINIMUM_ELBOW_POS = 0;
+    static final int MANUAL_CONTROL_RATE = 25;
+    static final String LEFT_ARM_MOTOR_NAME = "leftArmJointMotor";
+    static final String RIGHT_ARM_MOTOR_NAME = "rightArmJointMotor";
+    static final DcMotorSimple.Direction LEFT_ARM_MOTOR_DIRECTION = DcMotorSimple.Direction.REVERSE;
+    static final DcMotorSimple.Direction RIGHT_ARM_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
+    static final double ARM_JOINT_P = 0.0088;
+    static final double ARM_JOINT_I = 0;
+    static final double ARM_JOINT_D = 0.00017;
+    static final int ELBOW_STARTING_POS = 115;
+    static final int MAXIMUM_ELBOW_POS = 770;
+    static final int MINIMUM_ELBOW_POS = 0;
 
     private final DcMotorEx leftMotor;
     private final DcMotorEx rightMotor;
@@ -79,7 +79,7 @@ public class ElbowSubsystem extends SubsystemBase {
      * @return Position (ticks)
      */
     public int convertStickToTarget(double input, int rate) {
-        input = GamepadUtils.deadzone(input, DEADZONE);
+        input = GamepadUtils.deadzone(input);
         telemetry.addData("Target Position:", (int) (input * rate + targetPosition));
         return (int) (input * rate + targetPosition);
     }

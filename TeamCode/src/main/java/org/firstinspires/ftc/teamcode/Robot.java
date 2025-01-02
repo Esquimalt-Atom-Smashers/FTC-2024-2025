@@ -12,16 +12,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.subsystems.*;
+import org.firstinspires.ftc.teamcode.utils.GamepadUtils;
 
 public class Robot {
-   //CONSTANTS
-   private static final int MANUAL_CONTROL_RATE = 25;
-   private static final double DEADZONE = 0.1;
-   private static final int ELBOW_STARTING_POS = 115;
-   private static final int LINEAR_STARTING_POS = 0;
-   private static final int MAXIMUM_ELBOW_POS = 770;
-   private static final int MAXIMUM_SLIDE_POS = 2900;
-   
    private final OpMode opMode;
 
    private final GamepadEx driverGamepad;
@@ -113,30 +106,30 @@ public class Robot {
        Trigger moveToOuttakePosition = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.LEFT_BUMPER));
        moveToOuttakePosition.whenActive(() -> intakeSubsystem.rotateToPosition(IntakeSubsystem.WristPositions.OUTTAKE_POSITION));
 
-       Trigger intake = new Trigger(() -> operatorGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > DEADZONE);
+       Trigger intake = new Trigger(() -> operatorGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > GamepadUtils.DEADZONE);
        intake.whenActive(() -> intakeSubsystem.intake());
        intake.whenInactive(() -> intakeSubsystem.stopIntakeServo());
 
-       Trigger outtake = new Trigger(() -> operatorGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > DEADZONE);
+       Trigger outtake = new Trigger(() -> operatorGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > GamepadUtils.DEADZONE);
        outtake.whenActive(() -> intakeSubsystem.outtake());
        outtake.whenInactive(() -> intakeSubsystem.stopIntakeServo());
 
        Trigger goHome = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.DPAD_LEFT));
        goHome.whenActive(new SequentialCommandGroup(
-               new RunCommand(() -> elbowSubsystem.setTargetPosition(ELBOW_STARTING_POS)),
-               new RunCommand(() -> linearSlideSubsystem.setTargetPosition(LINEAR_STARTING_POS))
+               new RunCommand(() -> elbowSubsystem.setTargetPosition(ElbowSubsystem.ELBOW_STARTING_POS)),
+               new RunCommand(() -> linearSlideSubsystem.setTargetPosition(LinearSlideSubsystem.LINEAR_STARTING_POS))
        ));
 
        Trigger goToOuttakePosition = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.DPAD_UP));
        goToOuttakePosition.whenActive(new SequentialCommandGroup(
-               new RunCommand(() -> elbowSubsystem.setTargetPosition(MAXIMUM_ELBOW_POS)),
-               new RunCommand(() -> linearSlideSubsystem.setTargetPosition(MAXIMUM_SLIDE_POS))
+               new RunCommand(() -> elbowSubsystem.setTargetPosition(ElbowSubsystem.MAXIMUM_ELBOW_POS)),
+               new RunCommand(() -> linearSlideSubsystem.setTargetPosition(LinearSlideSubsystem.MAXIMUM_SLIDE_POS))
        ));
 
        Trigger goHomeFromOuttake = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.DPAD_DOWN));
        goHomeFromOuttake.whenActive(new SequentialCommandGroup(
-               new RunCommand(() -> linearSlideSubsystem.setTargetPosition(LINEAR_STARTING_POS)),
-               new RunCommand(() -> elbowSubsystem.setTargetPosition(ELBOW_STARTING_POS))
+               new RunCommand(() -> linearSlideSubsystem.setTargetPosition(LinearSlideSubsystem.LINEAR_STARTING_POS)),
+               new RunCommand(() -> elbowSubsystem.setTargetPosition(ElbowSubsystem.ELBOW_STARTING_POS))
        ));
    }
 

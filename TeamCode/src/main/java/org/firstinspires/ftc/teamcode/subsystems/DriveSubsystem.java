@@ -22,22 +22,21 @@ import org.firstinspires.ftc.teamcode.utils.GamepadUtils;
 
 public class DriveSubsystem extends SubsystemBase {
     //CONSTANTS
-    private static final String IMU_NAME = "imu";
-    private static final IMU.Parameters IMU_PARAMETERS = new IMU.Parameters(
+    static final String IMU_NAME = "imu";
+    static final IMU.Parameters IMU_PARAMETERS = new IMU.Parameters(
         new RevHubOrientationOnRobot(
             RevHubOrientationOnRobot.LogoFacingDirection.UP,
             RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
         )
     );
-    private static final String FRONT_LEFT_MOTOR_NAME = "frontLeftMotor";
-    private static final String FRONT_RIGHT_MOTOR_NAME = "frontRightMotor";
-    private static final String BACK_LEFT_MOTOR_NAME = "rearLeftMotor";
-    private static final String BACK_RIGHT_MOTOR_NAME = "rearRightMotor";
-    private static final DcMotorSimple.Direction FRONT_LEFT_MOTOR_DIRECTION = DcMotorSimple.Direction.REVERSE;
-    private static final DcMotorSimple.Direction FRONT_RIGHT_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
-    private static final DcMotorSimple.Direction BACK_LEFT_MOTOR_DIRECTION = DcMotorSimple.Direction.REVERSE;
-    private static final DcMotorSimple.Direction BACK_RIGHT_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
-    private static final double DEADZONE = 0.1;
+    static final String FRONT_LEFT_MOTOR_NAME = "frontLeftMotor";
+    static final String FRONT_RIGHT_MOTOR_NAME = "frontRightMotor";
+    static final String BACK_LEFT_MOTOR_NAME = "rearLeftMotor";
+    static final String BACK_RIGHT_MOTOR_NAME = "rearRightMotor";
+    static final DcMotorSimple.Direction FRONT_LEFT_MOTOR_DIRECTION = DcMotorSimple.Direction.REVERSE;
+    static final DcMotorSimple.Direction FRONT_RIGHT_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
+    static final DcMotorSimple.Direction BACK_LEFT_MOTOR_DIRECTION = DcMotorSimple.Direction.REVERSE;
+    static final DcMotorSimple.Direction BACK_RIGHT_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
 
     private final HardwareMap hardwareMap;
     private final OpMode opMode;
@@ -86,9 +85,9 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     private void driveFieldCentric(double forward, double strafe, double turn) {
-        forward = GamepadUtils.deadzone(forward, DEADZONE);
-        strafe = GamepadUtils.deadzone(strafe, DEADZONE);
-        turn = GamepadUtils.deadzone(turn, DEADZONE);
+        forward = GamepadUtils.deadzone(forward);
+        strafe = GamepadUtils.deadzone(strafe);
+        turn = GamepadUtils.deadzone(turn);
 
         double gyroRadians = Math.toRadians(-getHeading());
         double fieldCentricStrafe = strafe * Math.cos(gyroRadians) - forward * Math.sin(gyroRadians);
@@ -101,9 +100,9 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     private void driveRobotCentric(double forward, double strafe, double turn) {
-        forward = GamepadUtils.deadzone(forward, DEADZONE);
-        strafe = GamepadUtils.deadzone(strafe, DEADZONE);
-        turn = GamepadUtils.deadzone(turn, DEADZONE);
+        forward = GamepadUtils.deadzone(forward);
+        strafe = GamepadUtils.deadzone(strafe);
+        turn = GamepadUtils.deadzone(turn);
 
         frontLeftMotor.setPower(Range.clip((forward + strafe + turn), -1, 1) * speedMultiplier);
         frontRightMotor.setPower(Range.clip((forward - strafe - turn), -1, 1) * speedMultiplier);

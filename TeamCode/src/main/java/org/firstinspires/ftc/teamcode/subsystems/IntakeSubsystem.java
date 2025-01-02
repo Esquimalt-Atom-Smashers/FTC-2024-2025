@@ -10,10 +10,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class IntakeSubsystem extends SubsystemBase {
     //CONSTANTS
-    private static final double WRIST_INTAKE_POS = 0.35;
-    private static final double WRIST_OUTTAKE_POS = 0;
-    private static final String ACTIVE_INTAKE_SERVO_NAME = "activeIntakeServo";
-    private static final String INTAKE_WRIST_SERVO_NAME = "intakeWristServo";
+    static final double WRIST_INTAKE_POS = 0.35;
+    static final double WRIST_OUTTAKE_POS = 0;
+    static final String ACTIVE_INTAKE_SERVO_NAME = "activeIntakeServo";
+    static final String INTAKE_WRIST_SERVO_NAME = "intakeWristServo";
 
     private final CRServo intakeServo;
     private final Servo wristServo;
