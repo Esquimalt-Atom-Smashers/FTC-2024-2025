@@ -13,9 +13,19 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.utils.GamepadUtils;
 
-import org.firstinspires.ftc.teamcode.Constants;
-
 public class LinearSlideSubsystem extends SubsystemBase {
+    //CONSTANTS
+    private static final String LINEAR_SLIDE_MOTOR_NAME = "linearSlideMotor";
+    private static final DcMotorSimple.Direction LINEAR_SLIDE_MOTOR_DIRECTION = DcMotorSimple.Direction.REVERSE;
+    private static final int LINEAR_STARTING_POS = 0;
+    private static final double LINEAR_SLIDE_P = 0.005;
+    private static final double LINEAR_SLIDE_I = 0;
+    private static final double LINEAR_SLIDE_D = 0;
+    private static final double PID_SAFE_POWER = 0.0;
+    private static final double DEADZONE = 0.1;
+    private static final int MINIMUM_SLIDE_POS = 0;
+    private static final int MAXIMUM_SLIDE_POS = 2900;
+
     private final DcMotorEx motor;
 
     private final HardwareMap hardwareMap;
@@ -36,13 +46,13 @@ public class LinearSlideSubsystem extends SubsystemBase {
         this.hardwareMap = opMode.hardwareMap;
         this.telemetry = opMode.telemetry;
 
-        motor = hardwareMap.get(DcMotorEx.class, Constants.IntakeConstants.LINEAR_SLIDE_MOTOR_NAME);
+        motor = hardwareMap.get(DcMotorEx.class, LINEAR_SLIDE_MOTOR_NAME);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motor.setDirection(Constants.IntakeConstants.LINEAR_SLIDE_MOTOR_DIRECTION);
+        motor.setDirection(LINEAR_SLIDE_MOTOR_DIRECTION);
 
-        targetPosition = Constants.IntakeConstants.LINEAR_STARTING_POS;
+        targetPosition = LINEAR_STARTING_POS;
 
-        controller = new PIDController(Constants.IntakeConstants.LINEAR_SLIDE_P, Constants.IntakeConstants.LINEAR_SLIDE_I, Constants.IntakeConstants.LINEAR_SLIDE_D);
+        controller = new PIDController(LINEAR_SLIDE_P, LINEAR_SLIDE_I, LINEAR_SLIDE_D);
 
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -65,7 +75,7 @@ public class LinearSlideSubsystem extends SubsystemBase {
 
         if(Math.abs(outputPower) > 0.6 ) {
             if (elapsedTime.seconds() > timeOut) {
-                motor.setPower(Constants.IntakeConstants.PID_SAFE_POWER);
+                motor.setPower(PID_SAFE_POWER);
                 telemetry.addLine("slide timeout triggered"); }
             else { motor.setPower(outputPower); }
         }else {
@@ -81,7 +91,7 @@ public class LinearSlideSubsystem extends SubsystemBase {
      * @return Position (ticks)
      */
     public int convertStickToTarget(double input, int rate) {
-        input = GamepadUtils.deadzone(input, Constants.DriveConstants.DEADZONE);
+        input = GamepadUtils.deadzone(input, DEADZONE);
         telemetry.addData("Target Position:", (int) (input * rate + targetPosition));
         return (int) (input * rate + targetPosition);
     }
@@ -91,7 +101,7 @@ public class LinearSlideSubsystem extends SubsystemBase {
     }
 
     public void setTargetPosition(int targetPosition) {
-        this.targetPosition = Range.clip(targetPosition, Constants.IntakeConstants.MINIMUM_SLIDE_POS, Constants.IntakeConstants.MAXIMUM_SLIDE_POS);
+        this.targetPosition = Range.clip(targetPosition, MINIMUM_SLIDE_POS, MAXIMUM_SLIDE_POS);
     }
 
     public int getCurrentPosition() {

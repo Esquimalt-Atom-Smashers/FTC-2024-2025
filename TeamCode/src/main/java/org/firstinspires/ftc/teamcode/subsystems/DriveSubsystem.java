@@ -21,6 +21,24 @@ import org.firstinspires.ftc.teamcode.utils.GamepadUtils;
 //TODO: Modify drive functions to make use of new odometry logic rather than IMU (check if it is actually more accurate first)
 
 public class DriveSubsystem extends SubsystemBase {
+    //CONSTANTS
+    private static final String IMU_NAME = "imu";
+    private static final IMU.Parameters IMU_PARAMETERS = new IMU.Parameters(
+        new RevHubOrientationOnRobot(
+            RevHubOrientationOnRobot.LogoFacingDirection.UP,
+            RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
+        )
+    );
+    private static final String FRONT_LEFT_MOTOR_NAME = "frontLeftMotor";
+    private static final String FRONT_RIGHT_MOTOR_NAME = "frontRightMotor";
+    private static final String BACK_LEFT_MOTOR_NAME = "rearLeftMotor";
+    private static final String BACK_RIGHT_MOTOR_NAME = "rearRightMotor";
+    private static final DcMotorSimple.Direction FRONT_LEFT_MOTOR_DIRECTION = DcMotorSimple.Direction.REVERSE;
+    private static final DcMotorSimple.Direction FRONT_RIGHT_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
+    private static final DcMotorSimple.Direction BACK_LEFT_MOTOR_DIRECTION = DcMotorSimple.Direction.REVERSE;
+    private static final DcMotorSimple.Direction BACK_RIGHT_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
+    private static final double DEADZONE = 0.1;
+
     private final HardwareMap hardwareMap;
     private final OpMode opMode;
     private final Telemetry telemetry;
@@ -40,18 +58,18 @@ public class DriveSubsystem extends SubsystemBase {
         this.hardwareMap = opMode.hardwareMap;
         this.telemetry = opMode.telemetry;
         
-        imu = hardwareMap.get(BHI260IMU.class, Constants.DriveConstants.IMU_NAME);
-        imu.initialize(Constants.DriveConstants.IMU_PARAMETERS);
+        imu = hardwareMap.get(BHI260IMU.class, IMU_NAME);
+        imu.initialize(IMU_PARAMETERS);
 
-        frontLeftMotor = hardwareMap.get(DcMotorEx.class, Constants.DriveConstants.FRONT_LEFT_MOTOR_NAME);
-        frontRightMotor = hardwareMap.get(DcMotorEx.class, Constants.DriveConstants.FRONT_RIGHT_MOTOR_NAME);
-        backLeftMotor = hardwareMap.get(DcMotorEx.class, Constants.DriveConstants.BACK_LEFT_MOTOR_NAME);
-        backRightMotor = hardwareMap.get(DcMotorEx.class, Constants.DriveConstants.BACK_RIGHT_MOTOR_NAME);
+        frontLeftMotor = hardwareMap.get(DcMotorEx.class, FRONT_LEFT_MOTOR_NAME);
+        frontRightMotor = hardwareMap.get(DcMotorEx.class, FRONT_RIGHT_MOTOR_NAME);
+        backLeftMotor = hardwareMap.get(DcMotorEx.class, BACK_LEFT_MOTOR_NAME);
+        backRightMotor = hardwareMap.get(DcMotorEx.class, BACK_RIGHT_MOTOR_NAME);
 
-        frontLeftMotor.setDirection(Constants.DriveConstants.FRONT_LEFT_MOTOR_DIRECTION);
-        frontRightMotor.setDirection(Constants.DriveConstants.FRONT_RIGHT_MOTOR_DIRECTION);
-        backLeftMotor.setDirection(Constants.DriveConstants.BACK_LEFT_MOTOR_DIRECTION);
-        backRightMotor.setDirection(Constants.DriveConstants.BACK_RIGHT_MOTOR_DIRECTION);
+        frontLeftMotor.setDirection(FRONT_LEFT_MOTOR_DIRECTION);
+        frontRightMotor.setDirection(FRONT_RIGHT_MOTOR_DIRECTION);
+        backLeftMotor.setDirection(BACK_LEFT_MOTOR_DIRECTION);
+        backRightMotor.setDirection(BACK_RIGHT_MOTOR_DIRECTION);
 
         frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -68,9 +86,9 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     private void driveFieldCentric(double forward, double strafe, double turn) {
-        forward = GamepadUtils.deadzone(forward, Constants.DriveConstants.DEADZONE);
-        strafe = GamepadUtils.deadzone(strafe, Constants.DriveConstants.DEADZONE);
-        turn = GamepadUtils.deadzone(turn, Constants.DriveConstants.DEADZONE);
+        forward = GamepadUtils.deadzone(forward, DEADZONE);
+        strafe = GamepadUtils.deadzone(strafe, DEADZONE);
+        turn = GamepadUtils.deadzone(turn, DEADZONE);
 
         double gyroRadians = Math.toRadians(-getHeading());
         double fieldCentricStrafe = strafe * Math.cos(gyroRadians) - forward * Math.sin(gyroRadians);
@@ -83,9 +101,9 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     private void driveRobotCentric(double forward, double strafe, double turn) {
-        forward = GamepadUtils.deadzone(forward, Constants.DriveConstants.DEADZONE);
-        strafe = GamepadUtils.deadzone(strafe, Constants.DriveConstants.DEADZONE);
-        turn = GamepadUtils.deadzone(turn, Constants.DriveConstants.DEADZONE);
+        forward = GamepadUtils.deadzone(forward, DEADZONE);
+        strafe = GamepadUtils.deadzone(strafe, DEADZONE);
+        turn = GamepadUtils.deadzone(turn, DEADZONE);
 
         frontLeftMotor.setPower(Range.clip((forward + strafe + turn), -1, 1) * speedMultiplier);
         frontRightMotor.setPower(Range.clip((forward - strafe - turn), -1, 1) * speedMultiplier);

@@ -9,10 +9,22 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.utils.GamepadUtils;
 
 public class ElbowSubsystem extends SubsystemBase {
+    //CONSTANTS
+    private static final String LEFT_ARM_MOTOR_NAME = "leftArmJointMotor";
+    private static final String RIGHT_ARM_MOTOR_NAME = "rightArmJointMotor";
+    private static final DcMotorSimple.Direction LEFT_ARM_MOTOR_DIRECTION = DcMotorSimple.Direction.REVERSE;
+    private static final DcMotorSimple.Direction RIGHT_ARM_MOTOR_DIRECTION = DcMotorSimple.Direction.FORWARD;
+    private static final double ARM_JOINT_P = 0.0088;
+    private static final double ARM_JOINT_I = 0;
+    private static final double ARM_JOINT_D = 0.00017;
+    private static final int ELBOW_STARTING_POS = 115;
+    private static final double DEADZONE = 0.1;
+    private static final int MAXIMUM_ELBOW_POS = 770;
+    private static final int MINIMUM_ELBOW_POS = 0;
+
     private final DcMotorEx leftMotor;
     private final DcMotorEx rightMotor;
     
@@ -29,17 +41,17 @@ public class ElbowSubsystem extends SubsystemBase {
         this.hardwareMap = opMode.hardwareMap;
         this.telemetry = opMode.telemetry;
 
-        leftMotor = hardwareMap.get(DcMotorEx.class, Constants.IntakeConstants.LEFT_ARM_MOTOR_NAME);
-        rightMotor = hardwareMap.get(DcMotorEx.class, Constants.IntakeConstants.RIGHT_ARM_MOTOR_NAME);
-        leftMotor.setDirection(Constants.IntakeConstants.LEFT_ARM_MOTOR_DIRECTION);
-        rightMotor.setDirection(Constants.IntakeConstants.RIGHT_ARM_MOTOR_DIRECTION);
+        leftMotor = hardwareMap.get(DcMotorEx.class, LEFT_ARM_MOTOR_NAME);
+        rightMotor = hardwareMap.get(DcMotorEx.class, RIGHT_ARM_MOTOR_NAME);
+        leftMotor.setDirection(LEFT_ARM_MOTOR_DIRECTION);
+        rightMotor.setDirection(RIGHT_ARM_MOTOR_DIRECTION);
 
-        controller = new PIDController(Constants.IntakeConstants.ARM_JOINT_P, Constants.IntakeConstants.ARM_JOINT_I, Constants.IntakeConstants.ARM_JOINT_D);
+        controller = new PIDController(ARM_JOINT_P, ARM_JOINT_I, ARM_JOINT_D);
 
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        targetPosition = Constants.IntakeConstants.ELBOW_STARTING_POS;
+        targetPosition = ELBOW_STARTING_POS;
 
         leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -67,14 +79,14 @@ public class ElbowSubsystem extends SubsystemBase {
      * @return Position (ticks)
      */
     public int convertStickToTarget(double input, int rate) {
-        input = GamepadUtils.deadzone(input, Constants.DriveConstants.DEADZONE);
+        input = GamepadUtils.deadzone(input, DEADZONE);
         telemetry.addData("Target Position:", (int) (input * rate + targetPosition));
         return (int) (input * rate + targetPosition);
     }
 
     public void setTargetPosition(int targetPosition) {
-        if(targetPosition > Constants.IntakeConstants.MAXIMUM_ELBOW_POS) this.targetPosition = Constants.IntakeConstants.MAXIMUM_ELBOW_POS;
-        if(targetPosition < Constants.IntakeConstants.MINIMUM_ELBOW_POS) this.targetPosition = Constants.IntakeConstants.MINIMUM_ELBOW_POS;
+        if(targetPosition > MAXIMUM_ELBOW_POS) this.targetPosition = MAXIMUM_ELBOW_POS;
+        if(targetPosition < MINIMUM_ELBOW_POS) this.targetPosition = MINIMUM_ELBOW_POS;
         this.targetPosition = targetPosition;
     }
 

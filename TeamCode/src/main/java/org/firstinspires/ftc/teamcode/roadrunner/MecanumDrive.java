@@ -42,7 +42,6 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.roadrunner.messages.DriveCommandMessage;
 import org.firstinspires.ftc.teamcode.roadrunner.messages.MecanumCommandMessage;
 import org.firstinspires.ftc.teamcode.roadrunner.messages.MecanumLocalizerInputsMessage;
@@ -206,22 +205,22 @@ public final class MecanumDrive {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
-        leftFront = hardwareMap.get(DcMotorEx.class, Constants.DriveConstants.FRONT_LEFT_MOTOR_NAME);
-        leftBack = hardwareMap.get(DcMotorEx.class, Constants.DriveConstants.BACK_LEFT_MOTOR_NAME);
-        rightBack = hardwareMap.get(DcMotorEx.class, Constants.DriveConstants.BACK_RIGHT_MOTOR_NAME);
-        rightFront = hardwareMap.get(DcMotorEx.class, Constants.DriveConstants.FRONT_RIGHT_MOTOR_NAME);
+        leftFront = hardwareMap.get(DcMotorEx.class, "frontLeftMotor");
+        leftBack = hardwareMap.get(DcMotorEx.class, "rearLeftMotor");
+        rightBack = hardwareMap.get(DcMotorEx.class, "rearRightMotor");
+        rightFront = hardwareMap.get(DcMotorEx.class, "frontRightMotor");
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        leftFront.setDirection(Constants.DriveConstants.FRONT_LEFT_MOTOR_DIRECTION);
-        leftBack.setDirection(Constants.DriveConstants.BACK_LEFT_MOTOR_DIRECTION);
-        rightBack.setDirection(Constants.DriveConstants.BACK_RIGHT_MOTOR_DIRECTION);
-        rightFront.setDirection(Constants.DriveConstants.FRONT_RIGHT_MOTOR_DIRECTION);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightBack.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        lazyImu = new LazyImu(hardwareMap, Constants.DriveConstants.IMU_NAME, Constants.DriveConstants.IMU_PARAMETERS_ROADRUNNER);
+        lazyImu = new LazyImu(hardwareMap, "imu", new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 

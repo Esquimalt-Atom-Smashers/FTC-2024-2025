@@ -14,6 +14,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.subsystems.*;
 
 public class Robot {
+   //CONSTANTS
+   private static final int MANUAL_CONTROL_RATE = 25;
+   private static final double DEADZONE = 0.1;
+   private static final int ELBOW_STARTING_POS = 115;
+   private static final int LINEAR_STARTING_POS = 0;
+   private static final int MAXIMUM_ELBOW_POS = 770;
+   private static final int MAXIMUM_SLIDE_POS = 2900;
+   
    private final OpMode opMode;
 
    private final GamepadEx driverGamepad;
@@ -94,10 +102,10 @@ public class Robot {
        elbowSubsystem.setDefaultCommand(defaultElbowCommand);
 
        Trigger setElbowPosition = new Trigger(() -> operatorGamepad.getLeftY() != 0);
-       setElbowPosition.whileActiveContinuous(() -> elbowSubsystem.setTargetPosition(elbowSubsystem.convertStickToTarget(operatorGamepad.getLeftY(), Constants.IntakeConstants.MANUAL_CONTROL_RATE)));
+       setElbowPosition.whileActiveContinuous(() -> elbowSubsystem.setTargetPosition(elbowSubsystem.convertStickToTarget(operatorGamepad.getLeftY(), MANUAL_CONTROL_RATE)));
 
        Trigger setLinearSlidePosition = new Trigger(() -> operatorGamepad.getRightY() != 0);
-       setLinearSlidePosition.whileActiveContinuous(() -> linearSlideSubsystem.setTargetPosition(linearSlideSubsystem.convertStickToTarget(operatorGamepad.getRightY(), Constants.IntakeConstants.MANUAL_CONTROL_RATE)));
+       setLinearSlidePosition.whileActiveContinuous(() -> linearSlideSubsystem.setTargetPosition(linearSlideSubsystem.convertStickToTarget(operatorGamepad.getRightY(), MANUAL_CONTROL_RATE)));
 
        Trigger moveToIntakePosition = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.RIGHT_BUMPER));
        moveToIntakePosition.whenActive(() -> intakeSubsystem.rotateToPosition(IntakeSubsystem.WristPositions.INTAKE_POSITION));
@@ -105,30 +113,30 @@ public class Robot {
        Trigger moveToOuttakePosition = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.LEFT_BUMPER));
        moveToOuttakePosition.whenActive(() -> intakeSubsystem.rotateToPosition(IntakeSubsystem.WristPositions.OUTTAKE_POSITION));
 
-       Trigger intake = new Trigger(() -> operatorGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > Constants.DriveConstants.DEADZONE);
+       Trigger intake = new Trigger(() -> operatorGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > DEADZONE);
        intake.whenActive(() -> intakeSubsystem.intake());
        intake.whenInactive(() -> intakeSubsystem.stopIntakeServo());
 
-       Trigger outtake = new Trigger(() -> operatorGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > Constants.DriveConstants.DEADZONE);
+       Trigger outtake = new Trigger(() -> operatorGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > DEADZONE);
        outtake.whenActive(() -> intakeSubsystem.outtake());
        outtake.whenInactive(() -> intakeSubsystem.stopIntakeServo());
 
        Trigger goHome = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.DPAD_LEFT));
        goHome.whenActive(new SequentialCommandGroup(
-               new RunCommand(() -> elbowSubsystem.setTargetPosition(Constants.IntakeConstants.ELBOW_STARTING_POS)),
-               new RunCommand(() -> linearSlideSubsystem.setTargetPosition(Constants.IntakeConstants.LINEAR_STARTING_POS))
+               new RunCommand(() -> elbowSubsystem.setTargetPosition(ELBOW_STARTING_POS)),
+               new RunCommand(() -> linearSlideSubsystem.setTargetPosition(LINEAR_STARTING_POS))
        ));
 
        Trigger goToOuttakePosition = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.DPAD_UP));
        goToOuttakePosition.whenActive(new SequentialCommandGroup(
-               new RunCommand(() -> elbowSubsystem.setTargetPosition(Constants.IntakeConstants.MAXIMUM_ELBOW_POS)),
-               new RunCommand(() -> linearSlideSubsystem.setTargetPosition(Constants.IntakeConstants.MAXIMUM_SLIDE_POS))
+               new RunCommand(() -> elbowSubsystem.setTargetPosition(MAXIMUM_ELBOW_POS)),
+               new RunCommand(() -> linearSlideSubsystem.setTargetPosition(MAXIMUM_SLIDE_POS))
        ));
 
        Trigger goHomeFromOuttake = new Trigger(() -> operatorGamepad.getButton(GamepadKeys.Button.DPAD_DOWN));
        goHomeFromOuttake.whenActive(new SequentialCommandGroup(
-               new RunCommand(() -> linearSlideSubsystem.setTargetPosition(Constants.IntakeConstants.LINEAR_STARTING_POS)),
-               new RunCommand(() -> elbowSubsystem.setTargetPosition(Constants.IntakeConstants.ELBOW_STARTING_POS))
+               new RunCommand(() -> linearSlideSubsystem.setTargetPosition(LINEAR_STARTING_POS)),
+               new RunCommand(() -> elbowSubsystem.setTargetPosition(ELBOW_STARTING_POS))
        ));
    }
 

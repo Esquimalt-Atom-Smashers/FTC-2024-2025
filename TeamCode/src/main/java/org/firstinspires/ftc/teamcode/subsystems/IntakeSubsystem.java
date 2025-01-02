@@ -7,9 +7,14 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Constants;
 
 public class IntakeSubsystem extends SubsystemBase {
+    //CONSTANTS
+    private static final double WRIST_INTAKE_POS = 0.35;
+    private static final double WRIST_OUTTAKE_POS = 0;
+    private static final String ACTIVE_INTAKE_SERVO_NAME = "activeIntakeServo";
+    private static final String INTAKE_WRIST_SERVO_NAME = "intakeWristServo";
+
     private final CRServo intakeServo;
     private final Servo wristServo;
 
@@ -18,8 +23,8 @@ public class IntakeSubsystem extends SubsystemBase {
     private final OpMode opMode;
 
     public static enum WristPositions {
-        INTAKE_POSITION(Constants.IntakeConstants.WRIST_INTAKE_POS), //Check this value!!!
-        OUTTAKE_POSITION(Constants.IntakeConstants.WRIST_OUTTAKE_POS); //Check this value!!!
+        INTAKE_POSITION(WRIST_INTAKE_POS), //Check this value!!!
+        OUTTAKE_POSITION(WRIST_OUTTAKE_POS); //Check this value!!!
 
         public double value;
 
@@ -33,8 +38,8 @@ public class IntakeSubsystem extends SubsystemBase {
         this.hardwareMap = opMode.hardwareMap;
         this.telemetry = opMode.telemetry;
 
-        intakeServo = hardwareMap.get(CRServo.class, Constants.IntakeConstants.ACTIVE_INTAKE_SERVO_NAME);
-        wristServo = hardwareMap.get(Servo.class, Constants.IntakeConstants.INTAKE_WRIST_SERVO_NAME);
+        intakeServo = hardwareMap.get(CRServo.class, ACTIVE_INTAKE_SERVO_NAME);
+        wristServo = hardwareMap.get(Servo.class, INTAKE_WRIST_SERVO_NAME);
     }
 
     public void intake() {
